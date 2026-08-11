@@ -1,0 +1,5 @@
+{
+  "name": "SkyTicket Generator",
+  "description": "A flight ticket generator that allows users to input flight details and export a high-quality PDF ticket in a specific layout.",
+  "requestFramePermissions": []
+}

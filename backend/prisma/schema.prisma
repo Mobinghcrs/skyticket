@@ -1,0 +1,299 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id                String   @id @default(cuid())
+  name              String
+  email             String   @unique
+  mobile            String
+  password          String
+  role              Role     @default(USER)
+  status            Status   @default(ACTIVE)
+  credit            Float    @default(0)
+  isUnlimited       Boolean  @default(false)
+  bonusFreeTickets  Int      @default(0)
+  permissions       Permission[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  tickets           TicketHistoryItem[]
+  transactions      Transaction[]
+
+  @@map("users")
+}
+
+model Permission {
+  id          String @id @default(cuid())
+  name        String @unique
+  description String?
+  users       User[]
+
+  @@map("permissions")
+}
+
+// Ticket Management
+model TicketHistoryItem {
+  id             String   @id @default(cuid())
+  ticketId       String   @unique
+  pnr            String
+  passengerName  String
+  route          String
+  date           String
+  issuedBy       String
+  status         TicketStatus @default(CONFIRMED)
+  price          String
+  paymentMethod  String
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ticket_history")
+}
+
+// Passenger Management
+model SavedPassenger {
+  id              String   @id @default(cuid())
+  firstName       String
+  lastName        String
+  gender          String
+  passportNumber  String
+  nationality     String
+  totalFlights    Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("saved_passengers")
+}
+
+// Transaction Management
+model Transaction {
+  id          String   @id @default(cuid())
+  date        String
+  amount      String
+  status      TransactionStatus @default(SUCCESS)
+  description String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@map("transactions")
+}
+
+// Base Data Management
+model Airline {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  logoUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  flights   SavedFlight[]
+
+  @@map("airlines")
+}
+
+model Airport {
+  id          String   @id @default(cuid())
+  name        String
+  code        String   @unique
+  city        String
+  country     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  originFlights  SavedFlight[] @relation("OriginAirport")
+  destFlights    SavedFlight[] @relation("DestAirport")
+
+  @@map("airports")
+}
+
+model SavedFlight {
+  id            String   @id @default(cuid())
+  flightNumber  String
+  airlineId     String
+  airline       Airline  @relation(fields: [airlineId], references: [id], onDelete: Cascade)
+  originCode    String
+  originAirport Airport  @relation("OriginAirport", fields: [originCode], references: [code], onDelete: Cascade)
+  destCode      String
+  destAirport   Airport  @relation("DestAirport", fields: [destCode], references: [code], onDelete: Cascade)
+  departureTime String
+  arrivalTime   String
+  date          String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("saved_flights")
+}
+
+// Ads Management
+model Ad {
+  id          String   @id @default(cuid())
+  location    AdLocation
+  title       String
+  description String
+  ctaText     String   @default("View")
+  linkUrl     String
+  imageUrl    String?
+  colorFrom   String?
+  colorTo     String?
+  iconName    String   @default("Sparkles")
+  isActive    Boolean  @default(true)
+  startDate   String?
+  endDate     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("ads")
+}
+
+// Blog Management
+model BlogPost {
+  id        String   @id @default(cuid())
+  title     String
+  excerpt   String
+  content   String
+  author    String   @default("Admin")
+  date      String
+  imageUrl  String?
+  status    PostStatus @default(PUBLISHED)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blog_posts")
+}
+
+// Settings
+model FooterConfig {
+  id        String  @id @default(cuid())
+  description String
+  address   String
+  phone     String
+  email     String
+  copyright String
+  facebook  String
+  twitter   String
+  instagram String
+  linkedin  String
+  updatedAt DateTime @updatedAt
+
+  @@map("footer_config")
+}
+
+model StaticPage {
+  id        String @id @default(cuid())
+  slug      String @unique
+  title     String
+  content   String
+  updatedAt DateTime @updatedAt
+
+  @@map("static_pages")
+}
+
+model RevenueConfig {
+  id                String  @id @default(cuid())
+  modelType         RevenueModelType
+  fixedPrice        Float
+  globalFreeLimit   Int     @default(0)
+  tiers             RevenueTier[]
+  updatedAt         DateTime @updatedAt
+
+  @@map("revenue_config")
+}
+
+model RevenueTier {
+  id                String @id @default(cuid())
+  revenueConfigId   String
+  revenueConfig     RevenueConfig @relation(fields: [revenueConfigId], references: [id], onDelete: Cascade)
+  minQty            Int
+  maxQty            Int?
+  pricePerTicket    Float
+
+  @@unique([revenueConfigId, minQty])
+  @@map("revenue_tiers")
+}
+
+model TicketTemplate {
+  id            String @id @default(cuid())
+  name          String
+  description   String
+  thumbnailColor String
+  isActive      Boolean @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("ticket_templates")
+}
+
+// Enums
+enum Role {
+  ADMIN
+  AGENT
+  USER
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
+enum PermissionType {
+  ISSUE_TICKET
+  MANAGE_USERS
+  MANAGE_BASE_DATA
+  VIEW_FINANCIALS
+  MANAGE_REVENUE
+  MANAGE_ADS
+  MANAGE_SETTINGS
+  MANAGE_BLOG
+}
+
+enum TicketStatus {
+  CONFIRMED
+  CANCELLED
+  PENDING
+}
+
+enum TransactionStatus {
+  SUCCESS
+  PENDING
+  FAILED
+}
+
+enum AdLocation {
+  SPOT_1
+  SPOT_2
+  SPOT_3
+  SPOT_4
+  SPOT_POPUP
+  SPOT_BOTTOM_1
+  SPOT_BOTTOM_2
+  SPOT_BOTTOM_3
+}
+
+enum PostStatus {
+  PUBLISHED
+  DRAFT
+}
+
+enum RevenueModelType {
+  FIXED
+  TIERED
+}
