@@ -1,0 +1,2045 @@
+{
+  "users": [
+    {
+      "id": "admin-user-id",
+      "name": "System Administrator",
+      "email": "admin@skyticket.com",
+      "mobile": "+1234567890",
+      "password": "$2b$10$TjUkBLCYKBILQgxyh5Qmc.q3RaYDZUGdP7yCike/sIxkmhkkP5IGq",
+      "role": "ADMIN",
+      "status": "ACTIVE",
+      "credit": 100000000,
+      "creditIrr": 100000000,
+      "creditUsd": 10000,
+      "giftCredit": 50000000,
+      "giftCreditIrr": 50000000,
+      "giftCreditUsd": 5000,
+      "isUnlimited": true,
+      "bonusFreeTickets": 100,
+      "permissions": [
+        {
+          "id": "cobby969hmuqu46fz",
+          "name": "ISSUE_TICKET"
+        },
+        {
+          "id": "cfa4euf22muqu46fz",
+          "name": "MANAGE_USERS"
+        },
+        {
+          "id": "ctwdp6x74muqu46fz",
+          "name": "MANAGE_BASE_DATA"
+        },
+        {
+          "id": "cfw8y8963muqu46fz",
+          "name": "VIEW_FINANCIALS"
+        },
+        {
+          "id": "c11se5wn5muqu46fz",
+          "name": "MANAGE_REVENUE"
+        },
+        {
+          "id": "cobcavrwcmuqu46fz",
+          "name": "MANAGE_ADS"
+        },
+        {
+          "id": "cknqsea9pmuqu46fz",
+          "name": "MANAGE_SETTINGS"
+        },
+        {
+          "id": "cvom8g44ymuqu46fz",
+          "name": "MANAGE_BLOG"
+        }
+      ],
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.448Z"
+    },
+    {
+      "id": "agent-user-id",
+      "name": "Sales Agent",
+      "email": "agent@skyticket.com",
+      "mobile": "+1234567891",
+      "password": "$2b$10$dtN2m3nCILxtcgD5jZDEFeTeZARlrwLWGMzLMgs1A3dT3gp4hwyni",
+      "role": "AGENT",
+      "status": "ACTIVE",
+      "credit": 50000000,
+      "creditIrr": 50000000,
+      "creditUsd": 5000,
+      "giftCredit": 10000000,
+      "giftCreditIrr": 10000000,
+      "giftCreditUsd": 1000,
+      "isUnlimited": false,
+      "bonusFreeTickets": 10,
+      "permissions": [
+        {
+          "id": "cobby969hmuqu46fz",
+          "name": "ISSUE_TICKET"
+        },
+        {
+          "id": "cfw8y8963muqu46fz",
+          "name": "VIEW_FINANCIALS"
+        }
+      ],
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.541Z"
+    },
+    {
+      "id": "regular-user-id",
+      "name": "Regular User",
+      "email": "user@skyticket.com",
+      "mobile": "+1234567892",
+      "password": "$2b$10$UEU3yCgfgdwMt0Jmuzt8TuzOjjNIF.1qhG.s4L74JyEcPNcZwJDC6",
+      "role": "USER",
+      "status": "ACTIVE",
+      "credit": 5000000,
+      "creditIrr": 5000000,
+      "creditUsd": 50,
+      "giftCredit": 1000000,
+      "giftCreditIrr": 1000000,
+      "giftCreditUsd": 10,
+      "isUnlimited": false,
+      "bonusFreeTickets": 2,
+      "permissions": [
+        {
+          "id": "cobby969hmuqu46fz",
+          "name": "ISSUE_TICKET"
+        }
+      ],
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.646Z"
+    },
+    {
+      "id": "aliali-user-id",
+      "name": "علی رضایی",
+      "email": "aliali@gmail.com",
+      "mobile": "+989123456789",
+      "password": "$2b$10$aj82.a9H3YCxE1owEgcyruBEY0Y6UG4bs13jFdZ8pENbCVGQv3nCG",
+      "role": "USER",
+      "status": "ACTIVE",
+      "credit": 10000000,
+      "creditIrr": 10000000,
+      "creditUsd": 100,
+      "giftCredit": 2000000,
+      "giftCreditIrr": 2000000,
+      "giftCreditUsd": 20,
+      "isUnlimited": false,
+      "bonusFreeTickets": 5,
+      "permissions": [
+        {
+          "id": "cobby969hmuqu46fz",
+          "name": "ISSUE_TICKET"
+        }
+      ],
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.768Z"
+    },
+    {
+      "name": "تست کاربر جدید",
+      "email": "newuser_1790938031791@example.com",
+      "mobile": "09129876543",
+      "password": "$2b$10$ERVCyIinjSmh40C8su9Wo.hir9QIIoWUyJHPoilcQmwI5lhnLVtFm",
+      "role": "USER",
+      "status": "ACTIVE",
+      "credit": 4000000,
+      "creditIrr": 4000000,
+      "creditUsd": 40,
+      "giftCredit": 1000000,
+      "giftCreditIrr": 1000000,
+      "giftCreditUsd": 10,
+      "isUnlimited": false,
+      "bonusFreeTickets": 0,
+      "permissions": [
+        {
+          "id": "cozwgwex8muqu9hjy",
+          "name": "ISSUE_TICKET"
+        }
+      ],
+      "id": "cw9w1bzpomuqu9hjy",
+      "createdAt": "2026-10-02T10:47:11.902Z",
+      "updatedAt": "2026-10-02T10:47:11.902Z"
+    },
+    {
+      "name": "تست کاربر جدید",
+      "email": "newuser_1790938052156@example.com",
+      "mobile": "09129876543",
+      "password": "$2b$10$9.vfgtluFZvHUcuTGsdWaebtl0ZwrMHU2qknz.O2FnUH2CtOrgjzC",
+      "role": "USER",
+      "status": "ACTIVE",
+      "credit": 3500000,
+      "creditIrr": 3500000,
+      "creditUsd": 40,
+      "giftCredit": 0,
+      "giftCreditIrr": 0,
+      "giftCreditUsd": 10,
+      "isUnlimited": false,
+      "bonusFreeTickets": 0,
+      "permissions": [
+        {
+          "id": "c095jmwt6muqu9x9n",
+          "name": "ISSUE_TICKET"
+        }
+      ],
+      "id": "cyrre2803muqu9x9n",
+      "createdAt": "2026-10-02T10:47:32.267Z",
+      "updatedAt": "2026-10-02T10:47:32.391Z"
+    }
+  ],
+  "permissions": [
+    {
+      "id": "cobby969hmuqu46fz",
+      "name": "ISSUE_TICKET",
+      "description": "Permission to issue ticket"
+    },
+    {
+      "id": "cfa4euf22muqu46fz",
+      "name": "MANAGE_USERS",
+      "description": "Permission to manage users"
+    },
+    {
+      "id": "ctwdp6x74muqu46fz",
+      "name": "MANAGE_BASE_DATA",
+      "description": "Permission to manage base data"
+    },
+    {
+      "id": "cfw8y8963muqu46fz",
+      "name": "VIEW_FINANCIALS",
+      "description": "Permission to view financials"
+    },
+    {
+      "id": "c11se5wn5muqu46fz",
+      "name": "MANAGE_REVENUE",
+      "description": "Permission to manage revenue"
+    },
+    {
+      "id": "cobcavrwcmuqu46fz",
+      "name": "MANAGE_ADS",
+      "description": "Permission to manage ads"
+    },
+    {
+      "id": "cknqsea9pmuqu46fz",
+      "name": "MANAGE_SETTINGS",
+      "description": "Permission to manage settings"
+    },
+    {
+      "id": "cvom8g44ymuqu46fz",
+      "name": "MANAGE_BLOG",
+      "description": "Permission to manage blog"
+    }
+  ],
+  "ticketHistoryItems": [
+    {
+      "id": "ca4pwwmeamuqu46g0",
+      "ticketId": "SKY00123456",
+      "pnr": "ABC123",
+      "passengerName": "Ahmad Rezaei",
+      "route": "MHD - THR",
+      "date": "2025-12-20",
+      "issuedBy": "System Administrator",
+      "status": "CONFIRMED",
+      "price": "$150.00",
+      "paymentMethod": "Wallet",
+      "userId": "admin-user-id",
+      "notes": "",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "c7y4j6srpmuqu46g0",
+      "ticketId": "SKY00123457",
+      "pnr": "DEF456",
+      "passengerName": "Maryam Karimi",
+      "route": "THR - IST",
+      "date": "2025-12-21",
+      "issuedBy": "Sales Agent",
+      "status": "CONFIRMED",
+      "price": "$320.00",
+      "paymentMethod": "Gateway",
+      "userId": "agent-user-id",
+      "notes": "",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "ticketId": "TEST-TICKET-1790937798110",
+      "pnr": "PNR22838",
+      "passengerName": "Test Passenger",
+      "route": "THR - MHD",
+      "date": "2026-10-15",
+      "issuedBy": "علی رضایی",
+      "status": "CONFIRMED",
+      "price": "3000000",
+      "paymentMethod": "Credit (کسر ریالی: 2,000,000 ریال از هدیه و 1,000,000 ریال از اصلی)",
+      "notes": "کسر ریالی: 2,000,000 ریال از هدیه و 1,000,000 ریال از اصلی",
+      "userId": "aliali-user-id",
+      "id": "ctu0pomspmuqu4h6f",
+      "createdAt": "2026-10-02T10:43:18.135Z",
+      "updatedAt": "2026-10-02T10:43:18.135Z"
+    },
+    {
+      "ticketId": "TEST-TICKET-1790937810342",
+      "pnr": "PNR47538",
+      "passengerName": "Test Passenger",
+      "route": "THR - MHD",
+      "date": "2026-10-15",
+      "issuedBy": "علی رضایی",
+      "status": "CONFIRMED",
+      "price": "3000000",
+      "paymentMethod": "Credit (کسر ریالی: 3,000,000 ریال از اصلی)",
+      "notes": "کسر ریالی: 3,000,000 ریال از اصلی",
+      "userId": "aliali-user-id",
+      "id": "cfdv3n4jpmuqu4qlp",
+      "createdAt": "2026-10-02T10:43:30.349Z",
+      "updatedAt": "2026-10-02T10:43:30.349Z"
+    },
+    {
+      "ticketId": "VERIFY-TICKET-1790938052386",
+      "pnr": "PNR26498",
+      "passengerName": "Passenger Test",
+      "route": "THR - SYZ",
+      "date": "2026-10-20",
+      "issuedBy": "تست کاربر جدید",
+      "status": "CONFIRMED",
+      "price": "1500000",
+      "paymentMethod": "Wallet (کسر ریالی: 1,000,000 ریال از هدیه و 500,000 ریال از اصلی)",
+      "notes": "کسر ریالی: 1,000,000 ریال از هدیه و 500,000 ریال از اصلی",
+      "userId": "cyrre2803muqu9x9n",
+      "id": "c5pby42anmuqu9xdk",
+      "createdAt": "2026-10-02T10:47:32.408Z",
+      "updatedAt": "2026-10-02T10:47:32.408Z"
+    }
+  ],
+  "savedPassengers": [
+    {
+      "id": "c2w2p3v85muqu46g0",
+      "firstName": "Ahmad",
+      "lastName": "Rezaei",
+      "gender": "Male",
+      "passportNumber": "A12345678",
+      "nationality": "Iranian",
+      "totalFlights": 5,
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "corbgug8rmuqu46g0",
+      "firstName": "Maryam",
+      "lastName": "Karimi",
+      "gender": "Female",
+      "passportNumber": "B87654321",
+      "nationality": "Iranian",
+      "totalFlights": 3,
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "crf38ea0zmuqu46g0",
+      "date": "2025-12-20",
+      "amount": "$150.00",
+      "status": "SUCCESS",
+      "description": "Ticket Issue #SKY00123456",
+      "userId": "admin-user-id",
+      "createdAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "ct9ti142hmuqu46g0",
+      "date": "2025-12-21",
+      "amount": "$320.00",
+      "status": "SUCCESS",
+      "description": "Ticket Issue #SKY00123457",
+      "userId": "agent-user-id",
+      "createdAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "date": "2026-10-15",
+      "amount": "3000000",
+      "status": "SUCCESS",
+      "description": "کسر ریالی: 2,000,000 ریال از هدیه و 1,000,000 ریال از اصلی",
+      "userId": "aliali-user-id",
+      "id": "ci6it46z5muqu4h6f",
+      "createdAt": "2026-10-02T10:43:18.135Z",
+      "updatedAt": "2026-10-02T10:43:18.135Z"
+    },
+    {
+      "date": "2026-10-15",
+      "amount": "3000000",
+      "status": "SUCCESS",
+      "description": "کسر ریالی: 3,000,000 ریال از اصلی",
+      "userId": "aliali-user-id",
+      "id": "ckip8ofkxmuqu4qlp",
+      "createdAt": "2026-10-02T10:43:30.349Z",
+      "updatedAt": "2026-10-02T10:43:30.349Z"
+    },
+    {
+      "date": "2026-10-20",
+      "amount": "1500000",
+      "status": "SUCCESS",
+      "description": "کسر ریالی: 1,000,000 ریال از هدیه و 500,000 ریال از اصلی",
+      "userId": "cyrre2803muqu9x9n",
+      "id": "cef7ilrjzmuqu9xdk",
+      "createdAt": "2026-10-02T10:47:32.408Z",
+      "updatedAt": "2026-10-02T10:47:32.408Z"
+    }
+  ],
+  "airlines": [
+    {
+      "id": "air_ir",
+      "name": "Iran Air (هما)",
+      "code": "IR",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/IR.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.769Z"
+    },
+    {
+      "id": "air_w5",
+      "name": "Mahan Air (ماهان)",
+      "code": "W5",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/W5.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.769Z"
+    },
+    {
+      "id": "air_is",
+      "name": "Sepehran Airlines (سپهران)",
+      "code": "IS",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/IS.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.770Z"
+    },
+    {
+      "id": "air_i3",
+      "name": "Ata Airlines (آتا)",
+      "code": "I3",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/I3.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.770Z"
+    },
+    {
+      "id": "air_zv",
+      "name": "Zagros Airlines (زاگرس)",
+      "code": "ZV",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/ZV.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.771Z"
+    },
+    {
+      "id": "air_y9",
+      "name": "Kish Air (کیش‌ایر)",
+      "code": "Y9",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/Y9.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.771Z"
+    },
+    {
+      "id": "air_qb",
+      "name": "Qeshm Air (قشم‌ایر)",
+      "code": "QB",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/QB.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.772Z"
+    },
+    {
+      "id": "air_ep",
+      "name": "Iran Aseman Airlines (آسمان)",
+      "code": "EP",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/EP.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.772Z"
+    },
+    {
+      "id": "air_hh",
+      "name": "Taban Air (تابان)",
+      "code": "HH",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/HH.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.772Z"
+    },
+    {
+      "id": "air_rv",
+      "name": "Caspian Airlines (کاسپین)",
+      "code": "RV",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/RV.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.773Z"
+    },
+    {
+      "id": "air_ji",
+      "name": "Meraj Airlines (معراج)",
+      "code": "JI",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/JI.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.773Z"
+    },
+    {
+      "id": "air_py",
+      "name": "Pouya Air (پویا)",
+      "code": "PY",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/PY.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.774Z"
+    },
+    {
+      "id": "air_vr",
+      "name": "Varesh Airlines (وارش)",
+      "code": "VR",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/VR.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.774Z"
+    },
+    {
+      "id": "air_fp",
+      "name": "FlyPersia (فلای پرشیا)",
+      "code": "FP",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/FP.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.774Z"
+    },
+    {
+      "id": "air_nv",
+      "name": "Karun Airlines (کارون / نفت)",
+      "code": "NV",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/NV.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.775Z"
+    },
+    {
+      "id": "air_pr",
+      "name": "Philippine Airlines",
+      "code": "PR",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/PR.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.829Z"
+    },
+    {
+      "id": "air_iv",
+      "name": "Iran Airtour (ایران ایرتور)",
+      "code": "IV",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/IV.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.776Z"
+    },
+    {
+      "id": "air_b9",
+      "name": "Iran Airtour (ایران ایرتور - B9)",
+      "code": "B9",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/B9.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.776Z"
+    },
+    {
+      "id": "air_irz",
+      "name": "Saha Airlines (ساها)",
+      "code": "IRZ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/IRZ.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.777Z"
+    },
+    {
+      "id": "air_ikv",
+      "name": "Chabahar Airlines (چابهار)",
+      "code": "IKV",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/IKV.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.777Z"
+    },
+    {
+      "id": "air_dzd",
+      "name": "Yazd Air (یزد ایر)",
+      "code": "DZD",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/DZD.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.778Z"
+    },
+    {
+      "id": "air_vaa",
+      "name": "Ava Airlines (آوا)",
+      "code": "VAA",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/VAA.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.778Z"
+    },
+    {
+      "id": "air_a1",
+      "name": "Arvan Airlines (آروان)",
+      "code": "A1",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/A1.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.778Z"
+    },
+    {
+      "id": "air_teh",
+      "name": "Tehran Airline (طهران)",
+      "code": "TEH",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/TEH.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.779Z"
+    },
+    {
+      "id": "air_tk",
+      "name": "Turkish Airlines",
+      "code": "TK",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/TK.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.779Z"
+    },
+    {
+      "id": "air_pc",
+      "name": "Pegasus Airlines",
+      "code": "PC",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/PC.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.779Z"
+    },
+    {
+      "id": "air_vf",
+      "name": "AJet (AnadoluJet)",
+      "code": "VF",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/VF.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.780Z"
+    },
+    {
+      "id": "air_xq",
+      "name": "SunExpress",
+      "code": "XQ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/XQ.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.780Z"
+    },
+    {
+      "id": "air_fz",
+      "name": "Flydubai",
+      "code": "FZ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/FZ.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.781Z"
+    },
+    {
+      "id": "air_ek",
+      "name": "Emirates",
+      "code": "EK",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/EK.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.781Z"
+    },
+    {
+      "id": "air_ey",
+      "name": "Etihad Airways",
+      "code": "EY",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/EY.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.781Z"
+    },
+    {
+      "id": "air_g9",
+      "name": "Air Arabia",
+      "code": "G9",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/G9.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.782Z"
+    },
+    {
+      "id": "air_3l",
+      "name": "Air Arabia Abu Dhabi",
+      "code": "3L",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/3L.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.782Z"
+    },
+    {
+      "id": "air_qr",
+      "name": "Qatar Airways",
+      "code": "QR",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/QR.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.783Z"
+    },
+    {
+      "id": "air_ia",
+      "name": "Iraqi Airways",
+      "code": "IA",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/IA.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.783Z"
+    },
+    {
+      "id": "air_ur",
+      "name": "Fly Baghdad",
+      "code": "UR",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/UR.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.783Z"
+    },
+    {
+      "id": "air_sv",
+      "name": "Saudia",
+      "code": "SV",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/SV.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.784Z"
+    },
+    {
+      "id": "air_xy",
+      "name": "Flynas",
+      "code": "XY",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/XY.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.784Z"
+    },
+    {
+      "id": "air_f3",
+      "name": "Flyadeal",
+      "code": "F3",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/F3.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.785Z"
+    },
+    {
+      "id": "air_ku",
+      "name": "Kuwait Airways",
+      "code": "KU",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/KU.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.785Z"
+    },
+    {
+      "id": "air_j9",
+      "name": "Jazeera Airways",
+      "code": "J9",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/J9.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.785Z"
+    },
+    {
+      "id": "air_wy",
+      "name": "Oman Air",
+      "code": "WY",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/WY.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.786Z"
+    },
+    {
+      "id": "air_ov",
+      "name": "SalamAir",
+      "code": "OV",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/OV.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.792Z"
+    },
+    {
+      "id": "air_gf",
+      "name": "Gulf Air",
+      "code": "GF",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/GF.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.793Z"
+    },
+    {
+      "id": "air_me",
+      "name": "Middle East Airlines (MEA)",
+      "code": "ME",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/ME.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.794Z"
+    },
+    {
+      "id": "air_rj",
+      "name": "Royal Jordanian",
+      "code": "RJ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/RJ.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.794Z"
+    },
+    {
+      "id": "air_rb",
+      "name": "Syrian Air",
+      "code": "RB",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/RB.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.795Z"
+    },
+    {
+      "id": "air_6q",
+      "name": "Cham Wings Airlines",
+      "code": "6Q",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/6Q.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.795Z"
+    },
+    {
+      "id": "air_iy",
+      "name": "Yemenia",
+      "code": "IY",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/IY.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.796Z"
+    },
+    {
+      "id": "air_j2",
+      "name": "Azerbaijan Airlines (AZAL)",
+      "code": "J2",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/J2.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.796Z"
+    },
+    {
+      "id": "air_a9",
+      "name": "Georgian Airways",
+      "code": "A9",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/A9.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.797Z"
+    },
+    {
+      "id": "air_rq",
+      "name": "Kam Air",
+      "code": "RQ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/RQ.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.797Z"
+    },
+    {
+      "id": "air_fg",
+      "name": "Ariana Afghan Airlines",
+      "code": "FG",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/FG.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.798Z"
+    },
+    {
+      "id": "air_kc",
+      "name": "Air Astana",
+      "code": "KC",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/KC.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.798Z"
+    },
+    {
+      "id": "air_dv",
+      "name": "SCAT Airlines",
+      "code": "DV",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/DV.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.799Z"
+    },
+    {
+      "id": "air_hy",
+      "name": "Uzbekistan Airways",
+      "code": "HY",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/HY.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.799Z"
+    },
+    {
+      "id": "air_t5",
+      "name": "Turkmenistan Airlines",
+      "code": "T5",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/T5.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.800Z"
+    },
+    {
+      "id": "air_sz",
+      "name": "Somon Air",
+      "code": "SZ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/SZ.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.800Z"
+    },
+    {
+      "id": "air_rm",
+      "name": "Armenia Aircompany",
+      "code": "RM",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/RM.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.801Z"
+    },
+    {
+      "id": "air_3f",
+      "name": "FlyOne Armenia",
+      "code": "3F",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/3F.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.801Z"
+    },
+    {
+      "id": "air_lh",
+      "name": "Lufthansa",
+      "code": "LH",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/LH.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.801Z"
+    },
+    {
+      "id": "air_ba",
+      "name": "British Airways",
+      "code": "BA",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/BA.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.802Z"
+    },
+    {
+      "id": "air_af",
+      "name": "Air France",
+      "code": "AF",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/AF.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.802Z"
+    },
+    {
+      "id": "air_kl",
+      "name": "KLM Royal Dutch Airlines",
+      "code": "KL",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/KL.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.803Z"
+    },
+    {
+      "id": "air_lx",
+      "name": "Swiss International Air Lines",
+      "code": "LX",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/LX.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.803Z"
+    },
+    {
+      "id": "air_os",
+      "name": "Austrian Airlines",
+      "code": "OS",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/OS.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.803Z"
+    },
+    {
+      "id": "air_su",
+      "name": "Aeroflot",
+      "code": "SU",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/SU.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.804Z"
+    },
+    {
+      "id": "air_s7",
+      "name": "S7 Airlines",
+      "code": "S7",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/S7.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.804Z"
+    },
+    {
+      "id": "air_ut",
+      "name": "UTair Aviation",
+      "code": "UT",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/UT.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.804Z"
+    },
+    {
+      "id": "air_dp",
+      "name": "Pobeda Airlines",
+      "code": "DP",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/DP.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.805Z"
+    },
+    {
+      "id": "air_fr",
+      "name": "Ryanair",
+      "code": "FR",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/FR.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.805Z"
+    },
+    {
+      "id": "air_u2",
+      "name": "EasyJet",
+      "code": "U2",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/U2.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.806Z"
+    },
+    {
+      "id": "air_w6",
+      "name": "Wizz Air",
+      "code": "W6",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/W6.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.806Z"
+    },
+    {
+      "id": "air_ib",
+      "name": "Iberia",
+      "code": "IB",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/IB.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.806Z"
+    },
+    {
+      "id": "air_ux",
+      "name": "Air Europa",
+      "code": "UX",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/UX.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.807Z"
+    },
+    {
+      "id": "air_vy",
+      "name": "Vueling",
+      "code": "VY",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/VY.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.807Z"
+    },
+    {
+      "id": "air_az",
+      "name": "ITA Airways",
+      "code": "AZ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/AZ.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.808Z"
+    },
+    {
+      "id": "air_tp",
+      "name": "TAP Air Portugal",
+      "code": "TP",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/TP.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.808Z"
+    },
+    {
+      "id": "air_sk",
+      "name": "Scandinavian Airlines (SAS)",
+      "code": "SK",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/SK.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.808Z"
+    },
+    {
+      "id": "air_dy",
+      "name": "Norwegian Air",
+      "code": "DY",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/DY.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.809Z"
+    },
+    {
+      "id": "air_ay",
+      "name": "Finnair",
+      "code": "AY",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/AY.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.809Z"
+    },
+    {
+      "id": "air_lo",
+      "name": "LOT Polish Airlines",
+      "code": "LO",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/LO.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.809Z"
+    },
+    {
+      "id": "air_sn",
+      "name": "Brussels Airlines",
+      "code": "SN",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/SN.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.810Z"
+    },
+    {
+      "id": "air_ei",
+      "name": "Aer Lingus",
+      "code": "EI",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/EI.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.810Z"
+    },
+    {
+      "id": "air_a3",
+      "name": "Aegean Airlines",
+      "code": "A3",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/A3.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.811Z"
+    },
+    {
+      "id": "air_ro",
+      "name": "TAROM",
+      "code": "RO",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/RO.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.811Z"
+    },
+    {
+      "id": "air_fb",
+      "name": "Bulgaria Air",
+      "code": "FB",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/FB.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.811Z"
+    },
+    {
+      "id": "air_ju",
+      "name": "Air Serbia",
+      "code": "JU",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/JU.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.812Z"
+    },
+    {
+      "id": "air_ou",
+      "name": "Croatia Airlines",
+      "code": "OU",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/OU.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.812Z"
+    },
+    {
+      "id": "air_ps",
+      "name": "Ukraine International",
+      "code": "PS",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/PS.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.812Z"
+    },
+    {
+      "id": "air_bt",
+      "name": "airBaltic",
+      "code": "BT",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/BT.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.813Z"
+    },
+    {
+      "id": "air_ew",
+      "name": "Eurowings",
+      "code": "EW",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/EW.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.813Z"
+    },
+    {
+      "id": "air_de",
+      "name": "Condor",
+      "code": "DE",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/DE.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.814Z"
+    },
+    {
+      "id": "air_lg",
+      "name": "Luxair",
+      "code": "LG",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/LG.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.814Z"
+    },
+    {
+      "id": "air_cy",
+      "name": "Cyprus Airways",
+      "code": "CY",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/CY.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.814Z"
+    },
+    {
+      "id": "air_sq",
+      "name": "Singapore Airlines",
+      "code": "SQ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/SQ.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.815Z"
+    },
+    {
+      "id": "air_tr",
+      "name": "Scoot",
+      "code": "TR",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/TR.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.815Z"
+    },
+    {
+      "id": "air_cx",
+      "name": "Cathay Pacific",
+      "code": "CX",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/CX.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.816Z"
+    },
+    {
+      "id": "air_uo",
+      "name": "HK Express",
+      "code": "UO",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/UO.png",
+      "createdAt": "2026-10-02T10:43:04.223Z",
+      "updatedAt": "2026-10-06T16:13:18.816Z"
+    },
+    {
+      "id": "air_cz",
+      "name": "China Southern Airlines",
+      "code": "CZ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/CZ.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.817Z"
+    },
+    {
+      "id": "air_mu",
+      "name": "China Eastern Airlines",
+      "code": "MU",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/MU.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.817Z"
+    },
+    {
+      "id": "air_ca",
+      "name": "Air China",
+      "code": "CA",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/CA.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.818Z"
+    },
+    {
+      "id": "air_hu",
+      "name": "Hainan Airlines",
+      "code": "HU",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/HU.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.818Z"
+    },
+    {
+      "id": "air_mf",
+      "name": "XiamenAir",
+      "code": "MF",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/MF.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.818Z"
+    },
+    {
+      "id": "air_3u",
+      "name": "Sichuan Airlines",
+      "code": "3U",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/3U.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.819Z"
+    },
+    {
+      "id": "air_zh",
+      "name": "Shenzhen Airlines",
+      "code": "ZH",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/ZH.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.819Z"
+    },
+    {
+      "id": "air_nh",
+      "name": "All Nippon Airways (ANA)",
+      "code": "NH",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/NH.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.822Z"
+    },
+    {
+      "id": "air_jl",
+      "name": "Japan Airlines (JAL)",
+      "code": "JL",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/JL.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.823Z"
+    },
+    {
+      "id": "air_ke",
+      "name": "Korean Air",
+      "code": "KE",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/KE.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.823Z"
+    },
+    {
+      "id": "air_oz",
+      "name": "Asiana Airlines",
+      "code": "OZ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/OZ.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.824Z"
+    },
+    {
+      "id": "air_7c",
+      "name": "Jeju Air",
+      "code": "7C",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/7C.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.824Z"
+    },
+    {
+      "id": "air_ci",
+      "name": "China Airlines",
+      "code": "CI",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/CI.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.824Z"
+    },
+    {
+      "id": "air_br",
+      "name": "EVA Air",
+      "code": "BR",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/BR.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.825Z"
+    },
+    {
+      "id": "air_jx",
+      "name": "STARLUX Airlines",
+      "code": "JX",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/JX.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.825Z"
+    },
+    {
+      "id": "air_tg",
+      "name": "Thai Airways",
+      "code": "TG",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/TG.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.826Z"
+    },
+    {
+      "id": "air_pg",
+      "name": "Bangkok Airways",
+      "code": "PG",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/PG.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.826Z"
+    },
+    {
+      "id": "air_mh",
+      "name": "Malaysia Airlines",
+      "code": "MH",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/MH.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.826Z"
+    },
+    {
+      "id": "air_ak",
+      "name": "AirAsia",
+      "code": "AK",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/AK.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.827Z"
+    },
+    {
+      "id": "air_ga",
+      "name": "Garuda Indonesia",
+      "code": "GA",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/GA.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.827Z"
+    },
+    {
+      "id": "air_jt",
+      "name": "Lion Air",
+      "code": "JT",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/JT.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.827Z"
+    },
+    {
+      "id": "air_vn",
+      "name": "Vietnam Airlines",
+      "code": "VN",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/VN.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.828Z"
+    },
+    {
+      "id": "air_vj",
+      "name": "VietJet Air",
+      "code": "VJ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/VJ.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.828Z"
+    },
+    {
+      "id": "air_pr_ph",
+      "name": "Philippine Airlines",
+      "code": "PR",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/PR.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "air_5j",
+      "name": "Cebu Pacific",
+      "code": "5J",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/5J.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.829Z"
+    },
+    {
+      "id": "air_pk",
+      "name": "Pakistan International (PIA)",
+      "code": "PK",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/PK.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.829Z"
+    },
+    {
+      "id": "air_er",
+      "name": "SereneAir",
+      "code": "ER",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/ER.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.830Z"
+    },
+    {
+      "id": "air_pa",
+      "name": "airblue",
+      "code": "PA",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/PA.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.830Z"
+    },
+    {
+      "id": "air_ai",
+      "name": "Air India",
+      "code": "AI",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/AI.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.830Z"
+    },
+    {
+      "id": "air_6e",
+      "name": "IndiGo",
+      "code": "6E",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/6E.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.831Z"
+    },
+    {
+      "id": "air_sg",
+      "name": "SpiceJet",
+      "code": "SG",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/SG.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.831Z"
+    },
+    {
+      "id": "air_uk",
+      "name": "Vistara",
+      "code": "UK",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/UK.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.832Z"
+    },
+    {
+      "id": "air_qp",
+      "name": "Akasa Air",
+      "code": "QP",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/QP.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.832Z"
+    },
+    {
+      "id": "air_bg",
+      "name": "Biman Bangladesh Airlines",
+      "code": "BG",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/BG.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.832Z"
+    },
+    {
+      "id": "air_ul",
+      "name": "SriLankan Airlines",
+      "code": "UL",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/UL.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.833Z"
+    },
+    {
+      "id": "air_ra",
+      "name": "Nepal Airlines",
+      "code": "RA",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/RA.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.833Z"
+    },
+    {
+      "id": "air_aa",
+      "name": "American Airlines",
+      "code": "AA",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/AA.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.838Z"
+    },
+    {
+      "id": "air_dl",
+      "name": "Delta Air Lines",
+      "code": "DL",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/DL.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.838Z"
+    },
+    {
+      "id": "air_ua",
+      "name": "United Airlines",
+      "code": "UA",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/UA.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.838Z"
+    },
+    {
+      "id": "air_wn",
+      "name": "Southwest Airlines",
+      "code": "WN",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/WN.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.839Z"
+    },
+    {
+      "id": "air_b6",
+      "name": "JetBlue Airways",
+      "code": "B6",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/B6.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.839Z"
+    },
+    {
+      "id": "air_as",
+      "name": "Alaska Airlines",
+      "code": "AS",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/AS.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.839Z"
+    },
+    {
+      "id": "air_nk",
+      "name": "Spirit Airlines",
+      "code": "NK",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/NK.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.840Z"
+    },
+    {
+      "id": "air_f9",
+      "name": "Frontier Airlines",
+      "code": "F9",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/F9.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.840Z"
+    },
+    {
+      "id": "air_ha",
+      "name": "Hawaiian Airlines",
+      "code": "HA",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/HA.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.841Z"
+    },
+    {
+      "id": "air_ac",
+      "name": "Air Canada",
+      "code": "AC",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/AC.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.841Z"
+    },
+    {
+      "id": "air_ws",
+      "name": "WestJet",
+      "code": "WS",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/WS.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.841Z"
+    },
+    {
+      "id": "air_am",
+      "name": "Aeromexico",
+      "code": "AM",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/AM.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.842Z"
+    },
+    {
+      "id": "air_y4",
+      "name": "Volaris",
+      "code": "Y4",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/Y4.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.842Z"
+    },
+    {
+      "id": "air_cm",
+      "name": "Copa Airlines",
+      "code": "CM",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/CM.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.843Z"
+    },
+    {
+      "id": "air_av",
+      "name": "Avianca",
+      "code": "AV",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/AV.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.843Z"
+    },
+    {
+      "id": "air_la",
+      "name": "LATAM Airlines",
+      "code": "LA",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/LA.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.843Z"
+    },
+    {
+      "id": "air_ar",
+      "name": "Aerolineas Argentinas",
+      "code": "AR",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/AR.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.844Z"
+    },
+    {
+      "id": "air_g3",
+      "name": "Gol Transportes Aereos",
+      "code": "G3",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/G3.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.844Z"
+    },
+    {
+      "id": "air_ad",
+      "name": "Azul Brazilian Airlines",
+      "code": "AD",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/AD.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.844Z"
+    },
+    {
+      "id": "air_et",
+      "name": "Ethiopian Airlines",
+      "code": "ET",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/ET.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.845Z"
+    },
+    {
+      "id": "air_ms",
+      "name": "EgyptAir",
+      "code": "MS",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/MS.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.845Z"
+    },
+    {
+      "id": "air_at",
+      "name": "Royal Air Maroc",
+      "code": "AT",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/AT.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.846Z"
+    },
+    {
+      "id": "air_ah",
+      "name": "Air Algerie",
+      "code": "AH",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/AH.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.846Z"
+    },
+    {
+      "id": "air_tu",
+      "name": "Tunisair",
+      "code": "TU",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/TU.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.846Z"
+    },
+    {
+      "id": "air_kq",
+      "name": "Kenya Airways",
+      "code": "KQ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/KQ.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.847Z"
+    },
+    {
+      "id": "air_sa",
+      "name": "Sample Airways Pro",
+      "code": "SA",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/SA.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:26.867Z"
+    },
+    {
+      "id": "air_qf",
+      "name": "Qantas Airways",
+      "code": "QF",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/QF.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.848Z"
+    },
+    {
+      "id": "air_va",
+      "name": "Virgin Australia",
+      "code": "VA",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/VA.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.848Z"
+    },
+    {
+      "id": "air_jq",
+      "name": "Jetstar Airways",
+      "code": "JQ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/JQ.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.848Z"
+    },
+    {
+      "id": "air_nz",
+      "name": "Air New Zealand",
+      "code": "NZ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/NZ.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.849Z"
+    },
+    {
+      "id": "air_fj",
+      "name": "Fiji Airways",
+      "code": "FJ",
+      "logoUrl": "https://cdn.charter118.ir/static/img/airlines/FJ.png",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-06T16:13:18.849Z"
+    },
+    {
+      "id": "air_tt",
+      "name": "Test",
+      "code": "TT",
+      "logoUrl": null,
+      "createdAt": "2026-10-06T16:07:29.493Z",
+      "updatedAt": "2026-10-06T16:07:49.775Z"
+    }
+  ],
+  "airports": [
+    {
+      "id": "1",
+      "name": "Tehran (Imam Khomeini)",
+      "code": "IKA",
+      "city": "Tehran",
+      "country": "Iran",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "2",
+      "name": "Tehran (Mehrabad)",
+      "code": "THR",
+      "city": "Tehran",
+      "country": "Iran",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "3",
+      "name": "Mashhad",
+      "code": "MHD",
+      "city": "Mashhad",
+      "country": "Iran",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "4",
+      "name": "Shiraz",
+      "code": "SYZ",
+      "city": "Shiraz",
+      "country": "Iran",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "5",
+      "name": "Isfahan",
+      "code": "IFN",
+      "city": "Isfahan",
+      "country": "Iran",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "6",
+      "name": "Tabriz",
+      "code": "TBZ",
+      "city": "Tabriz",
+      "country": "Iran",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "7",
+      "name": "Kish Island",
+      "code": "KIH",
+      "city": "Kish",
+      "country": "Iran",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "8",
+      "name": "Dubai",
+      "code": "DXB",
+      "city": "Dubai",
+      "country": "UAE",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "9",
+      "name": "Istanbul",
+      "code": "IST",
+      "city": "Istanbul",
+      "country": "Turkey",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "10",
+      "name": "Doha",
+      "code": "DOH",
+      "city": "Doha",
+      "country": "Qatar",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    }
+  ],
+  "savedFlights": [
+    {
+      "id": "cp4gjmi46muqu46g0",
+      "flightNumber": "IR-123",
+      "airlineId": "2",
+      "originCode": "MHD",
+      "destCode": "THR",
+      "departureTime": "08:00",
+      "arrivalTime": "09:30",
+      "date": "2025-12-20",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "c9b1ecl79muqu46g0",
+      "flightNumber": "TK-456",
+      "airlineId": "20",
+      "originCode": "THR",
+      "destCode": "IST",
+      "departureTime": "14:00",
+      "arrivalTime": "16:30",
+      "date": "2025-12-21",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    }
+  ],
+  "ads": [
+    {
+      "id": "cwx6k0baomuqu46g0",
+      "location": "SPOT_1",
+      "title": "Special Discount",
+      "description": "Get 20% off on international flights!",
+      "ctaText": "Book Now",
+      "linkUrl": "#",
+      "imageUrl": null,
+      "colorFrom": "from-blue-600",
+      "colorTo": "to-blue-400",
+      "iconName": "Sparkles",
+      "isActive": true,
+      "startDate": null,
+      "endDate": null,
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "cgdihdb1nmuqu46g0",
+      "location": "SPOT_2",
+      "title": "Winter Sale",
+      "description": "Exclusive winter offers on all routes.",
+      "ctaText": "View Offers",
+      "linkUrl": "#",
+      "imageUrl": null,
+      "colorFrom": "from-green-600",
+      "colorTo": "to-green-400",
+      "iconName": "Gift",
+      "isActive": true,
+      "startDate": null,
+      "endDate": null,
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    }
+  ],
+  "blogPosts": [
+    {
+      "id": "cu4ywdxn7muqu46g0",
+      "title": "Travel Tips for International Flights",
+      "excerpt": "Essential tips for a smooth international journey.",
+      "content": "When traveling internationally, always verify passport validity, arriving at least 3 hours prior to departure.",
+      "author": "Admin",
+      "date": "2025-12-01",
+      "imageUrl": null,
+      "status": "PUBLISHED",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "cd2iacqqnmuqu46g0",
+      "title": "Airport Security Guidelines",
+      "excerpt": "What you need to know about airport security procedures.",
+      "content": "Modern airport security procedures ensure passenger safety. Keep liquids in 100ml containers.",
+      "author": "Admin",
+      "date": "2025-12-05",
+      "imageUrl": null,
+      "status": "PUBLISHED",
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    }
+  ],
+  "footerConfigs": [
+    {
+      "id": "ccnrv6ifxmuqu46g0",
+      "description": "Leading ticket booking and itinerary generation service for airlines worldwide.",
+      "address": "123 Airport Road, Aviation City, AC 12345",
+      "phone": "+1 (555) 123-4567",
+      "email": "support@skyticket.com",
+      "copyright": "© 2026 SkyTicket. All rights reserved.",
+      "facebook": "https://facebook.com",
+      "twitter": "https://twitter.com",
+      "instagram": "https://instagram.com",
+      "linkedin": "https://linkedin.com",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    }
+  ],
+  "staticPages": [
+    {
+      "id": "clalq2veumuqu46g0",
+      "slug": "terms",
+      "title": "Terms & Conditions",
+      "content": "Standard terms and conditions for flight ticket generation and reservations.",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    },
+    {
+      "id": "c5mnieib3muqu46g0",
+      "slug": "privacy",
+      "title": "Privacy Policy",
+      "content": "We value your privacy. Data collected is used solely for generating flight tickets.",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    }
+  ],
+  "revenueConfigs": [
+    {
+      "id": "cyn82yl1emuqu46g0",
+      "modelType": "TIERED",
+      "fixedPrice": 10,
+      "globalFreeLimit": 5,
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    }
+  ],
+  "revenueTiers": [
+    {
+      "id": "clyfx2akgmuqu46g0",
+      "revenueConfigId": "cyn82yl1emuqu46g0",
+      "minQty": 1,
+      "maxQty": 10,
+      "pricePerTicket": 15
+    },
+    {
+      "id": "cq0df34wpmuqu46g0",
+      "revenueConfigId": "cyn82yl1emuqu46g0",
+      "minQty": 11,
+      "maxQty": 50,
+      "pricePerTicket": 12
+    },
+    {
+      "id": "cg6tmeb1hmuqu46g0",
+      "revenueConfigId": "cyn82yl1emuqu46g0",
+      "minQty": 51,
+      "maxQty": 100,
+      "pricePerTicket": 10
+    },
+    {
+      "id": "co3k3er63muqu46g0",
+      "revenueConfigId": "cyn82yl1emuqu46g0",
+      "minQty": 101,
+      "maxQty": null,
+      "pricePerTicket": 8
+    }
+  ],
+  "ticketTemplates": [
+    {
+      "id": "cz7f2uk2emuqu46g0",
+      "name": "Standard Template",
+      "description": "Standard airline ticket layout with clean blue theme",
+      "thumbnailColor": "#0b74de",
+      "isActive": true,
+      "createdAt": "2026-10-02T10:43:04.224Z",
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    }
+  ],
+  "ticketPricingConfigs": [
+    {
+      "id": "default-pricing-id",
+      "defaultCurrency": "IRR",
+      "domesticPriceIrr": 500000,
+      "domesticPriceUsd": 10,
+      "internationalPriceIrr": 1500000,
+      "internationalPriceUsd": 25,
+      "exchangeRateUsdToIrr": 900000,
+      "customAirlinePrices": [
+        {
+          "id": "ap_1",
+          "airlineCode": "W5",
+          "airlineName": "Mahan Air (هواپیمایی ماهان)",
+          "priceIrr": 600000,
+          "priceUsd": 12,
+          "isActive": true
+        },
+        {
+          "id": "ap_2",
+          "airlineCode": "IR",
+          "airlineName": "Iran Air (هما ایران ایر)",
+          "priceIrr": 550000,
+          "priceUsd": 11,
+          "isActive": true
+        },
+        {
+          "id": "ap_3",
+          "airlineCode": "TK",
+          "airlineName": "Turkish Airlines (ترکیش ایرلاینز)",
+          "priceIrr": 2000000,
+          "priceUsd": 35,
+          "isActive": true
+        },
+        {
+          "id": "ap_4",
+          "airlineCode": "EK",
+          "airlineName": "Emirates (هواپیمایی امارات)",
+          "priceIrr": 2500000,
+          "priceUsd": 40,
+          "isActive": true
+        },
+        {
+          "id": "ap_5",
+          "airlineCode": "FZ",
+          "airlineName": "Flydubai (فلای دبی)",
+          "priceIrr": 1800000,
+          "priceUsd": 30,
+          "isActive": true
+        },
+        {
+          "id": "ap_6",
+          "airlineCode": "QR",
+          "airlineName": "Qatar Airways (قطر ایرویز)",
+          "priceIrr": 2500000,
+          "priceUsd": 40,
+          "isActive": true
+        }
+      ],
+      "updatedAt": "2026-10-02T10:43:04.224Z"
+    }
+  ]
+}

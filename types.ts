@@ -11,6 +11,7 @@ export interface AgencyData {
   phone: string;
   logoUrl: string | null;
   showLogo?: boolean;
+  address?: string;
 }
 
 export interface Flight {
@@ -24,6 +25,8 @@ export interface Flight {
   destCode: string; // e.g., NJF
   destName: string; // e.g., Najaf
   airline: string;
+  airlineLogo?: string;
+  aircraft?: string;
   baggage: string; // e.g., 20 kg
   handBaggage?: string; // e.g. 5 Kg (Specific to Sepehr)
   flightClass?: string; // e.g. YYSFF (Specific to Sepehr)
@@ -42,6 +45,8 @@ export interface Passenger {
   localPnr?: string; // Specific to Sepehr
   price?: string;
   idType?: 'Passport' | 'NationalID';
+  issueTime?: string;
+  issueDate?: string;
 }
 
 export interface TicketData {
@@ -71,8 +76,11 @@ export interface SavedPassenger {
   lastName: string;
   gender: string;
   passportNumber: string;
+  nationalId?: string;
   nationality: string;
   totalFlights: number;
+  issueDate?: string;
+  issueTime?: string;
 }
 
 export interface User {
@@ -84,9 +92,34 @@ export interface User {
   role: 'Admin' | 'Agent' | 'User';
   status: 'Active' | 'Inactive';
   credit: number;
+  creditIrr?: number;
+  creditUsd?: number;
+  giftCredit?: number;
+  giftCreditIrr?: number;
+  giftCreditUsd?: number;
   isUnlimited?: boolean;
   bonusFreeTickets?: number;
   permissions: Permission[];
+}
+
+export interface CustomAirlinePrice {
+  id: string;
+  airlineCode: string;
+  airlineName: string;
+  priceIrr: number;
+  priceUsd: number;
+  isActive: boolean;
+}
+
+export interface TicketPricingConfig {
+  defaultCurrency: 'IRR' | 'USD';
+  domesticPriceIrr: number;
+  domesticPriceUsd: number;
+  internationalPriceIrr: number;
+  internationalPriceUsd: number;
+  exchangeRateUsdToIrr: number;
+  customAirlinePrices: CustomAirlinePrice[];
+  updatedAt?: string;
 }
 
 export type Permission = 'ISSUE_TICKET' | 'MANAGE_USERS' | 'MANAGE_BASE_DATA' | 'VIEW_FINANCIALS' | 'MANAGE_REVENUE' | 'MANAGE_ADS' | 'MANAGE_SETTINGS' | 'MANAGE_BLOG';

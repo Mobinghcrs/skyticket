@@ -16,7 +16,7 @@
   "keywords": ["tickets", "airlines", "booking", "api"],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "@prisma/client": "^6.19.1",
     "bcryptjs": "^3.0.3",

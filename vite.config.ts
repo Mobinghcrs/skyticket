@@ -5,19 +5,16 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   return {
+    root: path.resolve(__dirname, 'frontend'),
+    publicDir: path.resolve(__dirname, 'frontend/public'),
+    build: {
+      outDir: path.resolve(__dirname, 'dist'),
+      emptyOutDir: true,
+    },
     server: {
       port: 3000,
       host: '0.0.0.0',
-      proxy: {
-        '/api': {
-          target: 'http://localhost:5000',
-          changeOrigin: true
-        },
-        '/uploads': {
-          target: 'http://localhost:5000',
-          changeOrigin: true
-        }
-      }
+      hmr: false,
     },
     plugins: [react()],
     define: {
@@ -26,7 +23,7 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        '@': path.resolve(__dirname, 'frontend'),
       }
     }
   };

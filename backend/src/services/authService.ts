@@ -28,13 +28,21 @@ export class AuthService {
   static async login(loginData: LoginData): Promise<AuthResponse> {
     try {
       const { identifier, password } = loginData;
+      const cleanId = (identifier || '').trim();
+      const lowerId = cleanId.toLowerCase();
+      const digitsId = cleanId
+        .replace(/[۰-۹]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString())
+        .replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d).toString())
+        .replace(/[\s\-\(\)]/g, '');
 
-      // Find user
-      const user = await prisma.user.findFirst({
+      // Find user by email or mobile (case-insensitive)
+      let user = await prisma.user.findFirst({
         where: {
           OR: [
-            { email: identifier },
-            { mobile: identifier }
+            { email: { equals: lowerId, mode: 'insensitive' } },
+            { email: cleanId },
+            { mobile: cleanId },
+            { mobile: digitsId }
           ]
         },
         select: {
@@ -45,6 +53,11 @@ export class AuthService {
           role: true,
           status: true,
           credit: true,
+          creditIrr: true,
+          creditUsd: true,
+          giftCredit: true,
+          giftCreditIrr: true,
+          giftCreditUsd: true,
           isUnlimited: true,
           bonusFreeTickets: true,
           password: true,
@@ -52,19 +65,32 @@ export class AuthService {
         }
       });
 
+      // Fallback: check all users in store if findFirst missed casing
       if (!user) {
-        return { success: false, error: 'Invalid credentials' };
+        const allUsers = await prisma.user.findMany();
+        const matched = allUsers.find((u: any) =>
+          (u.email || '').toLowerCase() === lowerId ||
+          u.mobile === cleanId ||
+          u.mobile === digitsId
+        );
+        if (matched) {
+          user = matched;
+        }
+      }
+
+      if (!user) {
+        return { success: false, error: 'نام کاربری یا رمز عبور اشتباه است (Invalid credentials)' };
       }
 
       // Check password
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        return { success: false, error: 'Invalid credentials' };
+        return { success: false, error: 'نام کاربری یا رمز عبور اشتباه است (Invalid credentials)' };
       }
 
       // Check if user is active
       if (user.status !== 'ACTIVE') {
-        return { success: false, error: 'Account is inactive' };
+        return { success: false, error: 'حساب کاربری شما غیرفعال است (Account is inactive)' };
       }
 
       // Generate token
@@ -76,11 +102,19 @@ export class AuthService {
       return {
         success: true,
         token,
-        user: userWithoutPassword
+        user: {
+          ...userWithoutPassword,
+          credit: userWithoutPassword.creditIrr ?? userWithoutPassword.credit ?? 0,
+          creditIrr: userWithoutPassword.creditIrr ?? userWithoutPassword.credit ?? 0,
+          creditUsd: userWithoutPassword.creditUsd ?? 0,
+          giftCredit: userWithoutPassword.giftCreditIrr ?? userWithoutPassword.giftCredit ?? 0,
+          giftCreditIrr: userWithoutPassword.giftCreditIrr ?? userWithoutPassword.giftCredit ?? 0,
+          giftCreditUsd: userWithoutPassword.giftCreditUsd ?? 0
+        }
       };
     } catch (error) {
       console.error('Login error:', error);
-      return { success: false, error: 'Login failed' };
+      return { success: false, error: 'خطا در ورود به سیستم (Login failed)' };
     }
   }
 
@@ -151,13 +185,28 @@ export class AuthService {
           role: true,
           status: true,
           credit: true,
+          creditIrr: true,
+          creditUsd: true,
+          giftCredit: true,
+          giftCreditIrr: true,
+          giftCreditUsd: true,
           isUnlimited: true,
           bonusFreeTickets: true,
           permissions: true
         }
       });
 
-      return user;
+      if (!user) return null;
+
+      return {
+        ...user,
+        credit: user.creditIrr ?? user.credit ?? 0,
+        creditIrr: user.creditIrr ?? user.credit ?? 0,
+        creditUsd: user.creditUsd ?? 0,
+        giftCredit: user.giftCreditIrr ?? user.giftCredit ?? 0,
+        giftCreditIrr: user.giftCreditIrr ?? user.giftCredit ?? 0,
+        giftCreditUsd: user.giftCreditUsd ?? 0
+      };
     } catch (error) {
       console.error('Get current user error:', error);
       throw error;

@@ -1,4 +1,5 @@
 import api from './api';
+import { TicketPricingConfig } from '../../../../types';
 
 export interface FooterConfigResponse {
   id?: string;
@@ -55,5 +56,15 @@ export class SettingsService {
 
   static async deleteStaticPage(id: string): Promise<void> {
     await api.delete(`/settings/static-pages/${id}`);
+  }
+
+  static async getTicketPricing(): Promise<TicketPricingConfig> {
+    const response = await api.get('/settings/ticket-pricing');
+    return response.data.data;
+  }
+
+  static async updateTicketPricing(payload: Partial<TicketPricingConfig>): Promise<TicketPricingConfig> {
+    const response = await api.put('/settings/ticket-pricing', payload);
+    return response.data.data;
   }
 }

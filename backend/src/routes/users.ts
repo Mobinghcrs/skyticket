@@ -20,6 +20,11 @@ router.get('/', protect, authorize('ADMIN'), async (req, res) => {
         role: true,
         status: true,
         credit: true,
+        creditIrr: true,
+        creditUsd: true,
+        giftCredit: true,
+        giftCreditIrr: true,
+        giftCreditUsd: true,
         isUnlimited: true,
         bonusFreeTickets: true,
         permissions: true,
@@ -28,9 +33,19 @@ router.get('/', protect, authorize('ADMIN'), async (req, res) => {
       orderBy: { createdAt: 'desc' }
     });
 
+    const normalizedUsers = users.map((u: any) => ({
+      ...u,
+      credit: u.creditIrr ?? u.credit ?? 0,
+      creditIrr: u.creditIrr ?? u.credit ?? 0,
+      creditUsd: u.creditUsd ?? 0,
+      giftCredit: u.giftCreditIrr ?? u.giftCredit ?? 0,
+      giftCreditIrr: u.giftCreditIrr ?? u.giftCredit ?? 0,
+      giftCreditUsd: u.giftCreditUsd ?? 0
+    }));
+
     res.json({
       success: true,
-      data: users
+      data: normalizedUsers
     });
   } catch (error) {
     console.error('Get users error:', error);
@@ -66,6 +81,11 @@ router.get('/:id', protect, async (req, res) => {
         role: true,
         status: true,
         credit: true,
+        creditIrr: true,
+        creditUsd: true,
+        giftCredit: true,
+        giftCreditIrr: true,
+        giftCreditUsd: true,
         isUnlimited: true,
         bonusFreeTickets: true,
         permissions: true,
@@ -80,10 +100,18 @@ router.get('/:id', protect, async (req, res) => {
         error: 'User not found'
       });
     }
-              
+
     res.json({
       success: true,
-      data: user
+      data: {
+        ...user,
+        credit: user.creditIrr ?? user.credit ?? 0,
+        creditIrr: user.creditIrr ?? user.credit ?? 0,
+        creditUsd: user.creditUsd ?? 0,
+        giftCredit: user.giftCreditIrr ?? user.giftCredit ?? 0,
+        giftCreditIrr: user.giftCreditIrr ?? user.giftCredit ?? 0,
+        giftCreditUsd: user.giftCreditUsd ?? 0
+      }
     });
   } catch (error) {
     console.error('Get user error:', error);
@@ -98,21 +126,56 @@ router.get('/:id', protect, async (req, res) => {
 // @desc    Create new user
 // @access  Private (Admin only)
 router.post('/', protect, authorize('ADMIN'), [
-  body('name').trim().isLength({ min: 2 }),
-  body('email').isEmail().normalizeEmail(),
-  body('mobile').trim().isLength({ min: 10 }),
-  body('password').isLength({ min: 6 }),
-  body('role').optional().isIn(['ADMIN', 'AGENT', 'USER']),
-  body('status').optional().isIn(['ACTIVE', 'INACTIVE']),
-  body('bonusFreeTickets').optional().isInt({ min: 0 })
+  body('name')
+    .trim()
+    .isLength({ min: 2 })
+    .withMessage('نام کاربر باید حداقل ۲ حرف باشد (Name must be at least 2 characters)'),
+  body('email')
+    .trim()
+    .toLowerCase()
+    .custom((val) => {
+      if (!val || typeof val !== 'string') return false;
+      const clean = val.trim();
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean) || clean.includes('@');
+    })
+    .withMessage('فرمت آدرس ایمیل نامعتبر است (Email format is invalid)'),
+  body('mobile')
+    .trim()
+    .customSanitizer((val) => {
+      if (!val || typeof val !== 'string') return val;
+      return val
+        .replace(/[۰-۹]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString())
+        .replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d).toString())
+        .replace(/[\s\-\(\)]/g, '');
+    })
+    .isLength({ min: 5 })
+    .withMessage('شماره موبایل باید حداقل ۵ رقم باشد (Mobile number is required)'),
+  body('password')
+    .isLength({ min: 4 })
+    .withMessage('رمز عبور باید حداقل ۴ کاراکتر باشد (Password must be at least 4 characters)'),
+  body('role')
+    .optional()
+    .customSanitizer((val) => (typeof val === 'string' ? val.toUpperCase() : val))
+    .isIn(['ADMIN', 'AGENT', 'USER'])
+    .withMessage('نقش کاربر نامعتبر است (Role must be ADMIN, AGENT, or USER)'),
+  body('status')
+    .optional()
+    .customSanitizer((val) => (typeof val === 'string' ? val.toUpperCase() : val))
+    .isIn(['ACTIVE', 'INACTIVE'])
+    .withMessage('وضعیت کاربر نامعتبر است (Status must be ACTIVE or INACTIVE)'),
+  body('bonusFreeTickets')
+    .optional()
+    .customSanitizer((val) => parseInt(val, 10) || 0)
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      const details = errors.array();
+      const firstError = details[0]?.msg || 'Validation failed';
       return res.status(400).json({
         success: false,
-        error: 'Validation failed',
-        details: errors.array()
+        error: firstError,
+        details
       });
     }
 
@@ -124,19 +187,31 @@ router.post('/', protect, authorize('ADMIN'), [
       role = 'USER',
       status = 'ACTIVE',
       credit = 0,
+      creditIrr,
+      creditUsd = 0,
+      giftCredit = 0,
+      giftCreditIrr,
+      giftCreditUsd = 0,
       isUnlimited = false,
       bonusFreeTickets = 0
     } = req.body;
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
+    const normalizedRole = typeof role === 'string' ? role.toUpperCase() : 'USER';
+    const normalizedStatus = typeof status === 'string' ? status.toUpperCase() : 'ACTIVE';
+    const finalCreditIrr = parseFloat(creditIrr ?? credit) || 0;
+    const finalCreditUsd = parseFloat(creditUsd) || 0;
+    const finalGiftIrr = parseFloat(giftCreditIrr ?? giftCredit) || 0;
+    const finalGiftUsd = parseFloat(giftCreditUsd) || 0;
+
+    // Check if user already exists (case-insensitive)
+    const existingUser = await prisma.user.findFirst({
+      where: { email: { equals: email.toLowerCase(), mode: 'insensitive' } }
     });
 
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        error: 'User already exists with this email'
+        error: 'کاربری با این ایمیل از قبل در سیستم وجود دارد (User already exists with this email)'
       });
     }
 
@@ -146,19 +221,24 @@ router.post('/', protect, authorize('ADMIN'), [
     const hashedPassword = await bcrypt.default.hash(password, salt);
 
     // Get default permissions
-    const permissions = getDefaultPermissions(role);
+    const permissions = getDefaultPermissions(normalizedRole);
 
     const user = await prisma.user.create({
       data: {
         name,
-        email,
+        email: email.toLowerCase(),
         mobile,
         password: hashedPassword,
-        role,
-        status,
-        credit: parseFloat(credit),
-        isUnlimited,
-        bonusFreeTickets: parseInt(bonusFreeTickets, 10),
+        role: normalizedRole,
+        status: normalizedStatus,
+        credit: finalCreditIrr,
+        creditIrr: finalCreditIrr,
+        creditUsd: finalCreditUsd,
+        giftCredit: finalGiftIrr,
+        giftCreditIrr: finalGiftIrr,
+        giftCreditUsd: finalGiftUsd,
+        isUnlimited: Boolean(isUnlimited),
+        bonusFreeTickets: parseInt(bonusFreeTickets, 10) || 0,
         permissions: buildPermissionRelation(permissions)
       },
       select: {
@@ -169,15 +249,31 @@ router.post('/', protect, authorize('ADMIN'), [
         role: true,
         status: true,
         credit: true,
+        creditIrr: true,
+        creditUsd: true,
+        giftCredit: true,
+        giftCreditIrr: true,
+        giftCreditUsd: true,
         isUnlimited: true,
         bonusFreeTickets: true,
         permissions: true
       }
     });
 
+    const userResponse = {
+      ...user,
+      credit: user.creditIrr ?? user.credit ?? 0,
+      creditIrr: user.creditIrr ?? user.credit ?? 0,
+      creditUsd: user.creditUsd ?? 0,
+      giftCredit: user.giftCreditIrr ?? user.giftCredit ?? 0,
+      giftCreditIrr: user.giftCreditIrr ?? user.giftCredit ?? 0,
+      giftCreditUsd: user.giftCreditUsd ?? 0
+    };
+
     res.status(201).json({
       success: true,
-      data: user
+      data: userResponse,
+      user: userResponse
     });
   } catch (error) {
     console.error('Create user error:', error);
@@ -192,23 +288,52 @@ router.post('/', protect, authorize('ADMIN'), [
 // @desc    Update user
 // @access  Private (Admin or self)
 router.put('/:id', protect, [
-  body('name').optional().trim().isLength({ min: 2 }),
-  body('email').optional().isEmail().normalizeEmail(),
-  body('mobile').optional().trim().isLength({ min: 10 }),
-  body('password').optional().isLength({ min: 6 }),
-  body('role').optional().isIn(['ADMIN', 'AGENT', 'USER']),
-  body('status').optional().isIn(['ACTIVE', 'INACTIVE']),
+  body('name')
+    .optional()
+    .trim()
+    .isLength({ min: 2 })
+    .withMessage('نام کاربر باید حداقل ۲ حرف باشد'),
+  body('email')
+    .optional()
+    .trim()
+    .toLowerCase()
+    .custom((val) => !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || val.includes('@'))
+    .withMessage('فرمت آدرس ایمیل نامعتبر است'),
+  body('mobile')
+    .optional()
+    .trim()
+    .customSanitizer((val) => {
+      if (!val || typeof val !== 'string') return val;
+      return val
+        .replace(/[۰-۹]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString())
+        .replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d).toString())
+        .replace(/[\s\-\(\)]/g, '');
+    }),
+  body('password')
+    .optional({ checkFalsy: true })
+    .isLength({ min: 4 })
+    .withMessage('رمز عبور باید حداقل ۴ کاراکتر باشد'),
+  body('role')
+    .optional()
+    .customSanitizer((val) => (typeof val === 'string' ? val.toUpperCase() : val))
+    .isIn(['ADMIN', 'AGENT', 'USER']),
+  body('status')
+    .optional()
+    .customSanitizer((val) => (typeof val === 'string' ? val.toUpperCase() : val))
+    .isIn(['ACTIVE', 'INACTIVE']),
   body('credit').optional().isNumeric(),
   body('isUnlimited').optional().isBoolean(),
-  body('bonusFreeTickets').optional().isInt({ min: 0 })
+  body('bonusFreeTickets').optional().customSanitizer((val) => parseInt(val, 10) || 0)
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      const details = errors.array();
+      const firstError = details[0]?.msg || 'Validation failed';
       return res.status(400).json({
         success: false,
-        error: 'Validation failed',
-        details: errors.array()
+        error: firstError,
+        details
       });
     }
 
@@ -258,6 +383,34 @@ router.put('/:id', protect, [
     // Convert credit to number
     if (updateData.credit !== undefined) {
       updateData.credit = parseFloat(updateData.credit);
+      if (updateData.creditIrr === undefined) {
+        updateData.creditIrr = updateData.credit;
+      }
+    }
+
+    if (updateData.creditIrr !== undefined) {
+      updateData.creditIrr = parseFloat(updateData.creditIrr);
+      updateData.credit = updateData.creditIrr;
+    }
+
+    if (updateData.creditUsd !== undefined) {
+      updateData.creditUsd = parseFloat(updateData.creditUsd);
+    }
+
+    if (updateData.giftCredit !== undefined) {
+      updateData.giftCredit = parseFloat(updateData.giftCredit);
+      if (updateData.giftCreditIrr === undefined) {
+        updateData.giftCreditIrr = updateData.giftCredit;
+      }
+    }
+
+    if (updateData.giftCreditIrr !== undefined) {
+      updateData.giftCreditIrr = parseFloat(updateData.giftCreditIrr);
+      updateData.giftCredit = updateData.giftCreditIrr;
+    }
+
+    if (updateData.giftCreditUsd !== undefined) {
+      updateData.giftCreditUsd = parseFloat(updateData.giftCreditUsd);
     }
 
     if (updateData.bonusFreeTickets !== undefined) {
@@ -286,6 +439,11 @@ router.put('/:id', protect, [
         role: true,
         status: true,
         credit: true,
+        creditIrr: true,
+        creditUsd: true,
+        giftCredit: true,
+        giftCreditIrr: true,
+        giftCreditUsd: true,
         isUnlimited: true,
         bonusFreeTickets: true,
         permissions: true
@@ -294,7 +452,15 @@ router.put('/:id', protect, [
 
     res.json({
       success: true,
-      data: user
+      data: {
+        ...user,
+        credit: user.creditIrr ?? user.credit ?? 0,
+        creditIrr: user.creditIrr ?? user.credit ?? 0,
+        creditUsd: user.creditUsd ?? 0,
+        giftCredit: user.giftCreditIrr ?? user.giftCredit ?? 0,
+        giftCreditIrr: user.giftCreditIrr ?? user.giftCredit ?? 0,
+        giftCreditUsd: user.giftCreditUsd ?? 0
+      }
     });
   } catch (error) {
     console.error('Update user error:', error);

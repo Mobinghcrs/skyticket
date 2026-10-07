@@ -28,7 +28,7 @@ const likelyClass = (token) => {
   if (!token || token.length > 120) return false;
   if (/^(https?|data|mailto|tel):/i.test(token)) return false;
   if (/^[0-9]+$/.test(token)) return false;
-  if (token.includes('/') && !/(^|:)(w-|h-|bg-|text-|from-|to-|via-)/.test(token)) return false;
+  if (token.includes('/') && !/(^|:)(w-|h-|bg-|text-|from-|to-|via-|top-|bottom-|left-|right-|-?translate)/.test(token)) return false;
   return /-|:|\[|\]|\//.test(token)
     || ['flex', 'grid', 'block', 'hidden', 'relative', 'absolute', 'fixed', 'sticky', 'group', 'container', 'prose', 'shadow', 'sr-only', 'truncate'].includes(token);
 };
@@ -42,7 +42,8 @@ for (const file of files) {
 }
 
 [
-  'left-6', 'right-6', 'left-4', 'right-4', 'pr-12', 'pl-12', 'pl-4', 'pr-4', 'pr-10', 'pl-10',
+  'left-6', 'right-6', 'left-4', 'right-4', 'pr-12', 'pl-12', 'pl-4', 'pr-4', 'pr-10', 'pl-10', 'pl-9', 'pr-9', 'left-2.5', 'right-2.5',
+  'top-1/2', '-translate-y-1/2', 'translate-y-1/2', 'md:hidden', 'md:block', 'md:flex', 'md:grid', 'sm:grid-cols-2', 'lg:grid-cols-4',
   'rotate-180', 'bg-gradient-to-r', 'bg-gradient-to-br', 'bg-gradient-to-t', 'to-transparent',
   'from-blue-500', 'to-indigo-600', 'from-sky-500', 'to-blue-600', 'from-purple-500', 'to-pink-600',
   'from-emerald-500', 'to-teal-600', 'from-amber-500', 'to-orange-600', 'hover:scale-[1.01]',
@@ -55,5 +56,9 @@ for (const file of files) {
   const compiled = await tailwindcss.compile(inputCss);
   const css = compiled.build([...candidates]);
   fs.writeFileSync(path.join(root, 'generated-tailwind.css'), css);
+  const frontendPath = path.join(root, 'frontend');
+  if (fs.existsSync(frontendPath)) {
+    fs.writeFileSync(path.join(frontendPath, 'generated-tailwind.css'), css);
+  }
   console.log(`Generated Tailwind CSS with ${candidates.size} candidates.`);
 })();

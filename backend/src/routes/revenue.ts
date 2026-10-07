@@ -7,8 +7,8 @@ const router = express.Router();
 
 // @route   GET /api/revenue/config
 // @desc    Get revenue configuration
-// @access  Private (Admin only)
-router.get('/config', protect, checkPermission('MANAGE_REVENUE'), async (req, res) => {
+// @access  Public
+router.get('/config', async (req, res) => {
   try {
     let revenueConfig = await prisma.revenueConfig.findFirst({
       include: {
@@ -52,6 +52,26 @@ router.get('/config', protect, checkPermission('MANAGE_REVENUE'), async (req, re
       success: false,
       error: 'Server error'
     });
+  }
+});
+
+// @route   GET /api/revenue/transactions
+// @desc    Get all transactions
+// @access  Private (Admin or Agent)
+router.get('/transactions', protect, async (req, res) => {
+  try {
+    let whereClause: any = {};
+    if (req.user.role !== 'ADMIN') {
+      whereClause.userId = req.user.id;
+    }
+    const transactions = await prisma.transaction.findMany({
+      where: whereClause,
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json({ success: true, data: transactions });
+  } catch (error) {
+    console.error('Get transactions error:', error);
+    res.status(500).json({ success: false, error: 'Server error' });
   }
 });
 

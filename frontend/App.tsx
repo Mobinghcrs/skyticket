@@ -1,11 +1,16 @@
 
-import { useState, useRef, useEffect, ChangeEvent } from 'react';
-import html2canvas from 'html2canvas';
+import { useState, useRef, useEffect, useMemo, ChangeEvent } from 'react';
+import html2canvas from 'html2canvas-pro';
+import { jsPDF } from 'jspdf';
 import { TicketPreview } from './components/TicketPreview';
+import { SafeAirlineLogo } from './components/SafeAirlineLogo';
 import { Dashboard } from './components/Dashboard';
-import { TicketData, TripType, Flight, Passenger, AgencyData, SavedFlight, Airport, User, SavedPassenger, Permission, Language, TicketHistoryItem, Ad, TicketTemplate, FooterConfig, BlogPost, StaticPage, RevenueConfig, Airline } from './types';
-import { Download, Plane, Users, ArrowRightLeft, ArrowRight, Building2, Upload, Eye, EyeOff, Calendar, UserCircle, LogIn, LogOut, LayoutDashboard, FileText, X, Smartphone, Lock, Palette, Grid, AlignVerticalJustifyCenter, CreditCard, ShieldCheck, RefreshCw, UserCheck, Search, CheckCircle2, Globe, Sparkles, Hotel, ShieldPlus, ChevronRight, Zap, Gift, Megaphone, Facebook, Twitter, Instagram, Linkedin, MapPin, Mail, PhoneCall, Loader2, BookOpen, Tag, Clock, Coins, Coffee } from 'lucide-react';
+import { TicketData, TripType, Flight, Passenger, AgencyData, SavedFlight, Airport, User, SavedPassenger, Permission, Language, TicketHistoryItem, Ad, TicketTemplate, FooterConfig, BlogPost, StaticPage, RevenueConfig, Airline, TicketPricingConfig } from './types';
+import { Download, Plane, Users, ArrowRightLeft, ArrowRight, Building2, Upload, Eye, EyeOff, Calendar, UserCircle, LogIn, LogOut, LayoutDashboard, FileText, X, Smartphone, Lock, Palette, Grid, AlignVerticalJustifyCenter, CreditCard, ShieldCheck, RefreshCw, UserCheck, Search, CheckCircle2, Globe, Sparkles, Hotel, ShieldPlus, ChevronRight, ChevronDown, Zap, Gift, Megaphone, Facebook, Twitter, Instagram, Linkedin, MapPin, Mail, PhoneCall, Loader2, BookOpen, Tag, Clock, Coins, Coffee } from 'lucide-react';
 import { translations } from './translations';
+import { AIRLINES_CATALOG } from './src/data/airlinesCatalog';
+import { COMPREHENSIVE_AIRPORTS } from './src/data/airportsCatalog';
+import { getReliableAirlineLogo, generateDynamicAirlineEmblem } from './src/utils/airlineEmblems';
 import { BaseDataService } from './src/api/services/baseDataService';
 import { AuthService } from './src/api/services/authService';
 import { AdService } from './src/api/services/adService';
@@ -36,7 +41,12 @@ const normalizeUser = (user: any): User => ({
   mobile: user.mobile,
   role: user.role === 'ADMIN' ? 'Admin' : user.role === 'AGENT' ? 'Agent' : 'User',
   status: user.status === 'ACTIVE' ? 'Active' : 'Inactive',
-  credit: user.credit ?? 0,
+  credit: user.creditIrr ?? user.credit ?? 0,
+  creditIrr: user.creditIrr ?? user.credit ?? 0,
+  creditUsd: user.creditUsd ?? 0,
+  giftCredit: user.giftCreditIrr ?? user.giftCredit ?? 0,
+  giftCreditIrr: user.giftCreditIrr ?? user.giftCredit ?? 0,
+  giftCreditUsd: user.giftCreditUsd ?? 0,
   isUnlimited: Boolean(user.isUnlimited),
   bonusFreeTickets: user.bonusFreeTickets ?? 0,
   permissions: (user.permissions || []).map((permission: any) =>
@@ -136,189 +146,14 @@ const normalizeTicket = (ticket: any): TicketHistoryItem => ({
 
 // --- INITIAL DATA ---
 
-const INITIAL_AIRLINES: Airline[] = [
-  // --- IRANIAN AIRLINES ---
-  { id: '1', name: 'Mahan Air', code: 'W5' },
-  { id: '2', name: 'Iran Air', code: 'IR' },
-  { id: '3', name: 'Sepehran Airlines', code: 'IS' },
-  { id: '4', name: 'Ata Airlines', code: 'I3' },
-  { id: '5', name: 'Zagros Airlines', code: 'ZV' },
-  { id: '6', name: 'Kish Air', code: 'Y9' },
-  { id: '7', name: 'Qeshm Air', code: 'QB' },
-  { id: '8', name: 'Iran Aseman', code: 'EP' },
-  { id: '9', name: 'Taban Air', code: 'HH' },
-  { id: '10', name: 'Caspian Airlines', code: 'RV' },
-  { id: '11', name: 'Meraj Airlines', code: 'JI' },
-  { id: '12', name: 'Pouya Air', code: 'PY' },
-  { id: '13', name: 'Saha Airlines', code: 'IRZ' },
-  { id: '14', name: 'Varesh Airlines', code: 'VR' },
-  { id: '15', name: 'FlyPersia', code: 'FP' },
-  { id: '16', name: 'Karun Airlines', code: 'NV' },
-  { id: '17', name: 'Pars Air', code: 'PR' },
-  { id: '18', name: 'Chabahar Airlines', code: 'IKV' },
-  { id: '19', name: 'Yazd Air', code: 'DZD' },
-  { id: '34', name: 'Ava Air', code: 'VAA' },
-  { id: '35', name: 'Arvan Airlines', code: 'A1' },
+const INITIAL_AIRLINES: Airline[] = AIRLINES_CATALOG.map((item) => ({
+  id: `air_${item.code.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
+  name: item.name,
+  code: item.code,
+  logoUrl: item.logoUrl
+}));
 
-  // --- MIDDLE EAST ---
-  { id: '20', name: 'Turkish Airlines', code: 'TK' },
-  { id: '21', name: 'FlyDubai', code: 'FZ' },
-  { id: '22', name: 'Emirates', code: 'EK' },
-  { id: '23', name: 'Qatar Airways', code: 'QR' },
-  { id: '24', name: 'Iraqi Airways', code: 'IA' },
-  { id: '25', name: 'Pegasus Airlines', code: 'PC' },
-  { id: '26', name: 'Etihad Airways', code: 'EY' },
-  { id: '27', name: 'Saudia', code: 'SV' },
-  { id: '28', name: 'Oman Air', code: 'WY' },
-  { id: '29', name: 'Kuwait Airways', code: 'KU' },
-  { id: '30', name: 'Middle East Airlines', code: 'ME' },
-  { id: '31', name: 'Air Arabia', code: 'G9' },
-  { id: '32', name: 'Gulf Air', code: 'GF' },
-  { id: '33', name: 'Royal Jordanian', code: 'RJ' },
-
-  // --- EUROPE ---
-  { id: '40', name: 'Lufthansa', code: 'LH' },
-  { id: '41', name: 'British Airways', code: 'BA' },
-  { id: '42', name: 'Air France', code: 'AF' },
-  { id: '43', name: 'KLM', code: 'KL' },
-  { id: '44', name: 'Aeroflot', code: 'SU' },
-  { id: '45', name: 'Swiss International', code: 'LX' },
-  { id: '46', name: 'Austrian Airlines', code: 'OS' },
-  { id: '47', name: 'Ryanair', code: 'FR' },
-  { id: '48', name: 'EasyJet', code: 'U2' },
-  { id: '49', name: 'Wizz Air', code: 'W6' },
-  
-  // --- ASIA ---
-  { id: '60', name: 'Singapore Airlines', code: 'SQ' },
-  { id: '61', name: 'Cathay Pacific', code: 'CX' },
-  { id: '62', name: 'China Southern', code: 'CZ' },
-  { id: '63', name: 'China Eastern', code: 'MU' },
-  { id: '64', name: 'Air China', code: 'CA' },
-  { id: '65', name: 'All Nippon Airways', code: 'NH' },
-  { id: '66', name: 'Japan Airlines', code: 'JL' },
-  { id: '67', name: 'Korean Air', code: 'KE' },
-  { id: '68', name: 'Thai Airways', code: 'TG' },
-  { id: '69', name: 'Malaysia Airlines', code: 'MH' },
-  { id: '70', name: 'IndiGo', code: '6E' },
-  { id: '71', name: 'Air India', code: 'AI' },
-
-  // --- AMERICAS ---
-  { id: '80', name: 'American Airlines', code: 'AA' },
-  { id: '81', name: 'Delta Air Lines', code: 'DL' },
-  { id: '82', name: 'United Airlines', code: 'UA' },
-  { id: '83', name: 'Air Canada', code: 'AC' },
-  { id: '84', name: 'LATAM Airlines', code: 'LA' },
-];
-
-const INITIAL_AIRPORTS: Airport[] = [
-  // --- IRAN (MAJOR & INTERNATIONAL) ---
-  { id: '1', name: 'Imam Khomeini Intl', code: 'IKA', city: 'Tehran', country: 'Iran' },
-  { id: '2', name: 'Mehrabad Intl', code: 'THR', city: 'Tehran', country: 'Iran' },
-  { id: '3', name: 'Mashhad Intl', code: 'MHD', city: 'Mashhad', country: 'Iran' },
-  { id: '4', name: 'Shiraz Intl', code: 'SYZ', city: 'Shiraz', country: 'Iran' },
-  { id: '5', name: 'Isfahan Intl', code: 'IFN', city: 'Isfahan', country: 'Iran' },
-  { id: '6', name: 'Tabriz Intl', code: 'TBZ', city: 'Tabriz', country: 'Iran' },
-  { id: '7', name: 'Kish Intl', code: 'KIH', city: 'Kish Island', country: 'Iran' },
-  { id: '8', name: 'Qeshm Intl', code: 'GSM', city: 'Qeshm Island', country: 'Iran' },
-  { id: '9', name: 'Bandar Abbas Intl', code: 'BND', city: 'Bandar Abbas', country: 'Iran' },
-  { id: '10', name: 'Ahvaz Intl', code: 'AWZ', city: 'Ahvaz', country: 'Iran' },
-  { id: '11', name: 'Yazd Shahid Sadooghi', code: 'AZD', city: 'Yazd', country: 'Iran' },
-  { id: '12', name: 'Kerman Intl', code: 'KER', city: 'Kerman', country: 'Iran' },
-  { id: '13', name: 'Abadan Intl', code: 'ABD', city: 'Abadan', country: 'Iran' },
-  { id: '14', name: 'Bushehr', code: 'BUZ', city: 'Bushehr', country: 'Iran' },
-  { id: '15', name: 'Rasht (Sardar Jangal)', code: 'RAS', city: 'Rasht', country: 'Iran' },
-  { id: '16', name: 'Sari (Dasht-e Naz)', code: 'SRY', city: 'Sari', country: 'Iran' },
-  { id: '17', name: 'Gorgan', code: 'GBT', city: 'Gorgan', country: 'Iran' },
-  { id: '18', name: 'Zahedan Intl', code: 'ZAH', city: 'Zahedan', country: 'Iran' },
-  { id: '19', name: 'Chabahar (Konarak)', code: 'ZBR', city: 'Chabahar', country: 'Iran' },
-  { id: '20', name: 'Lamerd', code: 'LFM', city: 'Lamerd', country: 'Iran' },
-  { id: '21', name: 'Lar', code: 'LRR', city: 'Lar', country: 'Iran' },
-  { id: '22', name: 'Kermanshah', code: 'KSH', city: 'Kermanshah', country: 'Iran' },
-  { id: '23', name: 'Urmia', code: 'OMH', city: 'Urmia', country: 'Iran' },
-  { id: '24', name: 'Ardabil', code: 'ADU', city: 'Ardabil', country: 'Iran' },
-  { id: '25', name: 'Persian Gulf (Asaluyeh)', code: 'PGU', city: 'Asaluyeh', country: 'Iran' },
-  { id: '26', name: 'Birjand', code: 'XBJ', city: 'Birjand', country: 'Iran' },
-  { id: '27', name: 'Bojnord', code: 'BJB', city: 'Bojnord', country: 'Iran' },
-  { id: '28', name: 'Hamadan', code: 'HDM', city: 'Hamadan', country: 'Iran' },
-  { id: '29', name: 'Ilam', code: 'IIL', city: 'Ilam', country: 'Iran' },
-  { id: '30', name: 'Sanandaj', code: 'SDG', city: 'Sanandaj', country: 'Iran' },
-  { id: '31', name: 'Khorramabad', code: 'KHD', city: 'Khorramabad', country: 'Iran' },
-  { id: '32', name: 'Yasuj', code: 'YES', city: 'Yasuj', country: 'Iran' },
-  { id: '33', name: 'Shahr-e Kord', code: 'CQD', city: 'Shahr-e Kord', country: 'Iran' },
-  { id: '34', name: 'Dezful', code: 'DEF', city: 'Dezful', country: 'Iran' },
-  { id: '35', name: 'Mahshahr', code: 'MRX', city: 'Mahshahr', country: 'Iran' },
-  { id: '36', name: 'Jask', code: 'JSK', city: 'Jask', country: 'Iran' },
-  { id: '37', name: 'Jiroft', code: 'JYR', city: 'Jiroft', country: 'Iran' },
-  { id: '38', name: 'Rafsanjan', code: 'RJN', city: 'Rafsanjan', country: 'Iran' },
-  { id: '39', name: 'Sirjan', code: 'SYJ', city: 'Sirjan', country: 'Iran' },
-  { id: '40', name: 'Bam', code: 'BXR', city: 'Bam', country: 'Iran' },
-  { id: '41', name: 'Zabol', code: 'ACZ', city: 'Zabol', country: 'Iran' },
-  { id: '42', name: 'Iranshahr', code: 'IHR', city: 'Iranshahr', country: 'Iran' },
-  { id: '43', name: 'Saravan', code: 'SXV', city: 'Saravan', country: 'Iran' },
-  { id: '44', name: 'Ramsar', code: 'RZR', city: 'Ramsar', country: 'Iran' },
-  { id: '45', name: 'Noshahr', code: 'NSH', city: 'Noshahr', country: 'Iran' },
-  { id: '46', name: 'Kalaleh', code: 'KLM', city: 'Kalaleh', country: 'Iran' },
-  { id: '47', name: 'Sabzevar', code: 'AFZ', city: 'Sabzevar', country: 'Iran' },
-  { id: '48', name: 'Tabas', code: 'TCX', city: 'Tabas', country: 'Iran' },
-  { id: '49', name: 'Arak', code: 'AJK', city: 'Arak', country: 'Iran' },
-  { id: '50', name: 'Kashan', code: 'KKS', city: 'Kashan', country: 'Iran' },
-  { id: '51', name: 'Abumusa Island', code: 'AEU', city: 'Abumusa', country: 'Iran' },
-  { id: '52', name: 'Lavan Island', code: 'LVP', city: 'Lavan', country: 'Iran' },
-  { id: '53', name: 'Khark Island', code: 'KHK', city: 'Khark', country: 'Iran' },
-  { id: '54', name: 'Sirri Island', code: 'SXI', city: 'Sirri', country: 'Iran' },
-  { id: '55', name: 'Jahrom', code: 'JAR', city: 'Jahrom', country: 'Iran' },
-  { id: '56', name: 'Parsabad', code: 'PFQ', city: 'Parsabad', country: 'Iran' },
-  { id: '57', name: 'Khoy', code: 'KHY', city: 'Khoy', country: 'Iran' },
-  { id: '58', name: 'Maku', code: 'IMQ', city: 'Maku', country: 'Iran' },
-  { id: '59', name: 'Maragheh', code: 'ACP', city: 'Maragheh', country: 'Iran' },
-  { id: '60', name: 'Zanjan', code: 'JWN', city: 'Zanjan', country: 'Iran' },
-  { id: '61', name: 'Payam (Karaj)', code: 'PYK', city: 'Karaj', country: 'Iran' },
-  { id: '62', name: 'Shahroud', code: 'RUD', city: 'Shahroud', country: 'Iran' },
-  { id: '63', name: 'Bandar Lengeh', code: 'BDH', city: 'Bandar Lengeh', country: 'Iran' },
-  { id: '64', name: 'Gachsaran', code: 'GCH', city: 'Gachsaran', country: 'Iran' },
-  { id: '65', name: 'Semnan', code: 'SNX', city: 'Semnan', country: 'Iran' },
-  { id: '66', name: 'Gonabad', code: 'GNA', city: 'Gonabad', country: 'Iran' },
-  { id: '67', name: 'Bahregan', code: 'IAQ', city: 'Bahregan', country: 'Iran' },
-  { id: '68', name: 'Jam', code: 'KNR', city: 'Jam', country: 'Iran' },
-  { id: '69', name: 'Sarakhs', code: 'CKT', city: 'Sarakhs', country: 'Iran' },
-
-  // --- IRAQ ---
-  { id: '101', name: 'Al Najaf Intl', code: 'NJF', city: 'Najaf', country: 'Iraq' },
-  { id: '102', name: 'Baghdad Intl', code: 'BGW', city: 'Baghdad', country: 'Iraq' },
-  { id: '103', name: 'Erbil Intl', code: 'EBL', city: 'Erbil', country: 'Iraq' },
-  { id: '104', name: 'Sulaimaniyah Intl', code: 'ISU', city: 'Sulaimaniyah', country: 'Iraq' },
-  { id: '105', name: 'Basra Intl', code: 'BSR', city: 'Basra', country: 'Iraq' },
-
-  // --- UAE ---
-  { id: '201', name: 'Dubai Intl', code: 'DXB', city: 'Dubai', country: 'UAE' },
-  { id: '202', name: 'Sharjah Intl', code: 'SHJ', city: 'Sharjah', country: 'UAE' },
-  { id: '203', name: 'Abu Dhabi Intl', code: 'AUH', city: 'Abu Dhabi', country: 'UAE' },
-  
-  // --- TURKEY ---
-  { id: '301', name: 'Istanbul Airport', code: 'IST', city: 'Istanbul', country: 'Turkey' },
-  { id: '302', name: 'Sabiha Gokcen', code: 'SAW', city: 'Istanbul', country: 'Turkey' },
-  { id: '303', name: 'Antalya', code: 'AYT', city: 'Antalya', country: 'Turkey' },
-  { id: '304', name: 'Ankara Esenboga', code: 'ESB', city: 'Ankara', country: 'Turkey' },
-  { id: '305', name: 'Izmir Adnan Menderes', code: 'ADB', city: 'Izmir', country: 'Turkey' },
-  { id: '306', name: 'Van Ferit Melen', code: 'VAN', city: 'Van', country: 'Turkey' },
-
-  // --- OTHERS ---
-  { id: '401', name: 'Hamad Intl', code: 'DOH', city: 'Doha', country: 'Qatar' },
-  { id: '402', name: 'Muscat Intl', code: 'MCT', city: 'Muscat', country: 'Oman' },
-  { id: '403', name: 'Kuwait Intl', code: 'KWI', city: 'Kuwait City', country: 'Kuwait' },
-  { id: '404', name: 'Bahrain Intl', code: 'BAH', city: 'Manama', country: 'Bahrain' },
-  { id: '405', name: 'King Abdulaziz Intl', code: 'JED', city: 'Jeddah', country: 'Saudi Arabia' },
-  { id: '406', name: 'King Khalid Intl', code: 'RUH', city: 'Riyadh', country: 'Saudi Arabia' },
-  { id: '407', name: 'Prince Mohammad Bin Abdulaziz', code: 'MED', city: 'Medina', country: 'Saudi Arabia' },
-  { id: '408', name: 'Rafic Hariri Intl', code: 'BEY', city: 'Beirut', country: 'Lebanon' },
-  { id: '409', name: 'Queen Alia Intl', code: 'AMM', city: 'Amman', country: 'Jordan' },
-  { id: '410', name: 'Zvartnots Intl', code: 'EVN', city: 'Yerevan', country: 'Armenia' },
-  { id: '411', name: 'Tbilisi Intl', code: 'TBS', city: 'Tbilisi', country: 'Georgia' },
-  { id: '412', name: 'Heydar Aliyev Intl', code: 'GYD', city: 'Baku', country: 'Azerbaijan' },
-  { id: '413', name: 'Kabul Intl', code: 'KBL', city: 'Kabul', country: 'Afghanistan' },
-  { id: '414', name: 'Mazar-i-Sharif', code: 'MZR', city: 'Mazar-i-Sharif', country: 'Afghanistan' },
-  { id: '415', name: 'Herat', code: 'HEA', city: 'Herat', country: 'Afghanistan' },
-];
+const INITIAL_AIRPORTS: Airport[] = COMPREHENSIVE_AIRPORTS;
 
 const INITIAL_SAVED_FLIGHTS: SavedFlight[] = [
   { id: '1', flightNumber: '7300', airline: 'Sepehran Airlines', originCode: 'MHD', destCode: 'NJF', departureTime: '05:45', arrivalTime: '07:55', date: '2025-11-18' },
@@ -326,48 +161,91 @@ const INITIAL_SAVED_FLIGHTS: SavedFlight[] = [
 ];
 
 const INITIAL_SAVED_PASSENGERS: SavedPassenger[] = [
-  { id: '1', firstName: 'Humam', lastName: 'Alyassiry', gender: 'Male', passportNumber: 'A21192788', nationality: 'IRAQ', totalFlights: 12 },
-  { id: '2', firstName: 'Fatemeh', lastName: 'Alavi', gender: 'Female', passportNumber: 'B98765432', nationality: 'IRAN', totalFlights: 8 },
-  { id: '3', firstName: 'John', lastName: 'Smith', gender: 'Male', passportNumber: 'C12345678', nationality: 'UK', totalFlights: 3 },
-  { id: '4', firstName: 'Ali', lastName: 'Rezaei', gender: 'Male', passportNumber: 'D11223344', nationality: 'IRAN', totalFlights: 5 },
-  { id: '5', firstName: 'Sarah', lastName: 'Connor', gender: 'Female', passportNumber: 'E55667788', nationality: 'USA', totalFlights: 1 },
+  { id: '1', firstName: 'Humam', lastName: 'Alyassiry', gender: 'Male', passportNumber: 'A21192788', nationalId: '0921192788', nationality: 'IRAQ', totalFlights: 12 },
+  { id: '2', firstName: 'Fatemeh', lastName: 'Alavi', gender: 'Female', passportNumber: 'B98765432', nationalId: '0012345678', nationality: 'IRAN', totalFlights: 8 },
+  { id: '3', firstName: 'John', lastName: 'Smith', gender: 'Male', passportNumber: 'C12345678', nationalId: '1234567890', nationality: 'UK', totalFlights: 3 },
+  { id: '4', firstName: 'Ali', lastName: 'Rezaei', gender: 'Male', passportNumber: 'D11223344', nationalId: '0944556677', nationality: 'IRAN', totalFlights: 5 },
+  { id: '5', firstName: 'Sarah', lastName: 'Connor', gender: 'Female', passportNumber: 'E55667788', nationalId: '0088997766', nationality: 'USA', totalFlights: 1 },
+];
+
+const POPULAR_NATIONALITIES = [
+  { value: 'IRAQ', label: 'IRAQ', subLabel: 'عراق', badge: 'IQ' },
+  { value: 'IRAN', label: 'IRAN', subLabel: 'ایران', badge: 'IR' },
+  { value: 'AFGHANISTAN', label: 'AFGHANISTAN', subLabel: 'افغانستان', badge: 'AF' },
+  { value: 'TURKEY', label: 'TURKEY', subLabel: 'ترکیه', badge: 'TR' },
+  { value: 'UNITED ARAB EMIRATES', label: 'UAE (United Arab Emirates)', subLabel: 'امارات متحده عربی', badge: 'AE' },
+  { value: 'SAUDI ARABIA', label: 'SAUDI ARABIA', subLabel: 'عربستان سعودی', badge: 'SA' },
+  { value: 'QATAR', label: 'QATAR', subLabel: 'قطر', badge: 'QA' },
+  { value: 'OMAN', label: 'OMAN', subLabel: 'عمان', badge: 'OM' },
+  { value: 'KUWAIT', label: 'KUWAIT', subLabel: 'کویت', badge: 'KW' },
+  { value: 'SYRIA', label: 'SYRIA', subLabel: 'سوریه', badge: 'SY' },
+  { value: 'LEBANON', label: 'LEBANON', subLabel: 'لبنان', badge: 'LB' },
+  { value: 'PAKISTAN', label: 'PAKISTAN', subLabel: 'پاکستان', badge: 'PK' },
+  { value: 'INDIA', label: 'INDIA', subLabel: 'هندوستان', badge: 'IN' },
+  { value: 'CHINA', label: 'CHINA', subLabel: 'چین', badge: 'CN' },
+  { value: 'RUSSIA', label: 'RUSSIA', subLabel: 'روسیه', badge: 'RU' },
+  { value: 'GERMANY', label: 'GERMANY', subLabel: 'آلمان', badge: 'DE' },
+  { value: 'UNITED KINGDOM', label: 'UNITED KINGDOM', subLabel: 'انگلستان', badge: 'GB' },
+  { value: 'FRANCE', label: 'FRANCE', subLabel: 'فرانسه', badge: 'FR' },
+  { value: 'CANADA', label: 'CANADA', subLabel: 'کانادا', badge: 'CA' },
+  { value: 'UNITED STATES', label: 'UNITED STATES', subLabel: 'ایالات متحده آمریکا', badge: 'US' },
+  { value: 'AZERBAIJAN', label: 'AZERBAIJAN', subLabel: 'آذربایجان', badge: 'AZ' },
+  { value: 'ARMENIA', label: 'ARMENIA', subLabel: 'ارمنستان', badge: 'AM' },
+  { value: 'GEORGIA', label: 'GEORGIA', subLabel: 'گرجستان', badge: 'GE' },
+  { value: 'TAJIKISTAN', label: 'TAJIKISTAN', subLabel: 'تاجیکستان', badge: 'TJ' },
+  { value: 'UZBEKISTAN', label: 'UZBEKISTAN', subLabel: 'ازبکستان', badge: 'UZ' },
+  { value: 'TURKMENISTAN', label: 'TURKMENISTAN', subLabel: 'ترکمنستان', badge: 'TM' },
+  { value: 'MALAYSIA', label: 'MALAYSIA', subLabel: 'مالزی', badge: 'MY' },
+  { value: 'THAILAND', label: 'THAILAND', subLabel: 'تایلند', badge: 'TH' },
+  { value: 'INDONESIA', label: 'INDONESIA', subLabel: 'اندونزی', badge: 'ID' },
+  { value: 'AUSTRALIA', label: 'AUSTRALIA', subLabel: 'استرالیا', badge: 'AU' },
+  { value: 'ITALY', label: 'ITALY', subLabel: 'ایتالیا', badge: 'IT' },
+  { value: 'SPAIN', label: 'SPAIN', subLabel: 'اسپانیا', badge: 'ES' },
+  { value: 'NETHERLANDS', label: 'NETHERLANDS', subLabel: 'هلند', badge: 'NL' },
+  { value: 'SWEDEN', label: 'SWEDEN', subLabel: 'سوئد', badge: 'SE' },
+  { value: 'SWITZERLAND', label: 'SWITZERLAND', subLabel: 'سوئیس', badge: 'CH' }
 ];
 
 const INITIAL_PASSENGER: Passenger = {
-  ticketId: '2589746236',
+  ticketId: '',
   gender: 'Male',
-  firstName: 'HUMAM',
-  lastName: 'ALYASSIRY',
-  passportNumber: 'A21192788',
-  nationality: 'IRAQ',
-  pnr: 'PU8MR2',
-  localPnr: 'EJM25A',
-  price: '$150.00',
+  firstName: '',
+  lastName: '',
+  passportNumber: '',
+  nationality: 'IRAN',
+  pnr: 'P2FS5',
+  localPnr: 'P2FS5',
+  price: '25,000,000',
   idType: 'Passport',
+  issueDate: '07/Nov/2025',
+  issueTime: '18:11',
 };
 
 const INITIAL_AGENCY: AgencyData = {
-  name: 'Your Travel Agency',
-  phone: '+98 21 1234 5678',
+  name: 'If You Want To Go Far, Go Together',
+  phone: '09369848917',
   logoUrl: null,
-  showLogo: true
+  showLogo: true,
+  address: 'Mashhad, Iran'
 };
 
 const INITIAL_FLIGHT_1: Flight = {
-  flightNumber: '7300',
-  date: '18/Nov/2025',
-  isoDate: '2025-11-18',
-  originTime: '05:45',
-  destTime: '07:55',
-  originCode: 'MHD',
-  originName: 'Masshad',
+  flightNumber: '7399',
+  date: '12/Nov/2025',
+  isoDate: '2025-11-12',
+  originTime: '20:31',
+  destTime: '20:31',
+  originCode: 'AWZ',
+  originName: 'Ahvaz',
   destCode: 'NJF',
   destName: 'Najaf',
-  airline: 'Sepehran Airlines',
-  baggage: '20 kg',
+  airline: 'Sepehran Airlines (سپهران)',
+  airlineLogo: 'https://cdn.charter118.ir/static/img/airlines/IS.png',
+  aircraft: 'Boeing 737',
+  baggage: '20 KG',
   handBaggage: '5 Kg',
-  flightClass: 'YYSFF',
-  type: 'Go Flight'
+  flightClass: 'Economy',
+  type: 'Flight'
 };
 
 const INITIAL_FLIGHT_2: Flight = {
@@ -380,7 +258,8 @@ const INITIAL_FLIGHT_2: Flight = {
   originName: 'Najaf',
   destCode: 'MHD',
   destName: 'Masshad',
-  airline: 'Ava Airlines',
+  airline: 'Ava Airlines (هواپیمایی آوا)',
+  airlineLogo: 'https://cdn.charter118.ir/static/img/airlines/VAA.png',
   baggage: '20 kg',
   handBaggage: '5 Kg',
   flightClass: 'YYSFF',
@@ -388,13 +267,6 @@ const INITIAL_FLIGHT_2: Flight = {
 };
 
 const INITIAL_TEMPLATES: TicketTemplate[] = [
-  { id: '1', name: 'Standard Blue', description: 'Classic airline layout with blue headers', thumbnailColor: 'bg-blue-500', isActive: true },
-  { id: '2', name: 'Minimal Dark', description: 'High contrast black and white design', thumbnailColor: 'bg-gray-800', isActive: false },
-  { id: '3', name: 'Modern Red', description: 'Bold design with red accents', thumbnailColor: 'bg-red-500', isActive: false },
-  { id: '4', name: 'Golden Luxury', description: 'Premium gold styling for VIP tickets', thumbnailColor: 'bg-yellow-500', isActive: false },
-  { id: '5', name: 'Vertical Pass', description: 'Modern vertical boarding pass style', thumbnailColor: 'bg-slate-800', isActive: true },
-  { id: '6', name: 'Vertical Light', description: 'Clean vertical layout', thumbnailColor: 'bg-gray-200', isActive: false },
-  { id: '7', name: 'Official Sepehr', description: 'Official A4 layout for Sepehr/ATA', thumbnailColor: 'bg-stone-200', isActive: true },
   { id: '8', name: 'System Sepehr (New)', description: 'Exact replica of System Sepehr blue layout', thumbnailColor: 'bg-blue-600', isActive: true },
 ];
 
@@ -571,41 +443,44 @@ const INITIAL_ADS: Ad[] = [
         iconName: 'Gift',
         isActive: true
     },
-    // NEW VERTICAL ADS
+    // 3 SAMPLE VERTICAL BANNERS UNDER TICKET
     {
         id: '6',
         location: 'spot_bottom_1',
-        title: 'Exclusive Tours',
-        description: 'Discover hidden gems with our guides.',
-        ctaText: 'Explore',
+        title: 'خدمات تشریفات فرودگاهی CIP و VIP',
+        description: 'پذیرایی در سالن اختصاصی، گیت اختصاصی گذرنامه، بدون معطلی در صف پرواز و ترانسفر لوکس پای پلکان.',
+        ctaText: 'رزرو آنلاین CIP',
         linkUrl: '#',
-        colorFrom: 'from-pink-500',
-        colorTo: 'to-rose-500',
-        iconName: 'Globe',
+        colorFrom: 'from-amber-600',
+        colorTo: 'to-amber-900',
+        iconName: 'Coffee',
+        imageUrl: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80',
         isActive: true
     },
     {
         id: '7',
         location: 'spot_bottom_2',
-        title: 'VIP Lounge Access',
-        description: 'Relax in style before your flight.',
-        ctaText: 'Get Access',
+        title: 'صدور فوری ویزا و بیمه مسافرتی',
+        description: 'صدور آنی ویزای توریستی دبی، عمان، عراق و پوشش بیمه‌ای ۵۰ هزار یورویی سامان با تخفیف ویژه مسافران.',
+        ctaText: 'دریافت بیمه‌نامه',
         linkUrl: '#',
-        colorFrom: 'from-violet-600',
-        colorTo: 'to-indigo-600',
-        iconName: 'Coffee',
+        colorFrom: 'from-blue-600',
+        colorTo: 'to-indigo-900',
+        iconName: 'ShieldPlus',
+        imageUrl: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80',
         isActive: true
     },
     {
         id: '8',
         location: 'spot_bottom_3',
-        title: 'Best Exchange Rates',
-        description: 'Currency exchange with 0% commission.',
-        ctaText: 'Exchange',
+        title: 'رزرو هتل‌های ۵ ستاره تا ۵۰٪ تخفیف',
+        description: 'بهترین نرخ اقامت در هتل‌های لوکس نجف، کربلا، استانبول و دبی با صبحانه رایگان و تسویه ریالی شتاب.',
+        ctaText: 'مشاهده هتل‌ها',
         linkUrl: '#',
-        colorFrom: 'from-emerald-500',
-        colorTo: 'to-green-600',
-        iconName: 'Coins',
+        colorFrom: 'from-emerald-600',
+        colorTo: 'to-teal-900',
+        iconName: 'Hotel',
+        imageUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80',
         isActive: true
     }
 ];
@@ -618,72 +493,363 @@ const ICON_MAP: Record<string, any> = {
 // Input Component
 const Input = ({ label, name, value, onChange, placeholder, className = "" }: any) => (
   <div className={className}>
-    <label className="text-xs font-medium text-gray-500 mb-1 block">{label}</label>
+    <label className="text-xs font-semibold text-gray-700 mb-1.5 block">{label}</label>
     <input 
       type="text" 
       name={name} 
       value={value} 
       onChange={onChange} 
       placeholder={placeholder}
-      className="w-full p-2 rounded-lg border border-gray-300 bg-gray-50 text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+      className="w-full p-2.5 rounded-lg border-2 border-slate-400 hover:border-slate-500 bg-white text-sm text-gray-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition-all shadow-sm"
     />
   </div>
 );
 
-// FlightForm Component
-const FlightForm = ({ title, data, onChange, onDateChange, isSepehr, t, isRTL, airports }: any) => (
-  <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-    <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800">
-      <Plane className={`w-5 h-5 text-blue-500 ${title === t('returnFlight') ? 'rotate-180' : ''}`} /> {title}
-    </h2>
-    <div className="space-y-3">
-       <div className="grid grid-cols-2 gap-3">
-          <Input label={t('flightNumber')} name="flightNumber" value={data.flightNumber} onChange={onChange} />
-          <Input label={t('airline')} name="airline" value={data.airline} onChange={onChange} />
-       </div>
-       <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-xs font-medium text-gray-500 mb-1 block">{t('originCode')}</label>
-            <input list="airports-origin" name="originCode" value={data.originCode} onChange={onChange} className="w-full p-2 rounded-lg border border-gray-300 bg-gray-50 text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all uppercase" placeholder="MHD" />
-            <datalist id="airports-origin">
-                {airports.map((a: any) => <option key={a.id} value={a.code}>{a.city}</option>)}
-            </datalist>
+interface ComboboxOption {
+  value: string;
+  label: string;
+  subLabel?: string;
+  badge?: string;
+  logoUrl?: string;
+  extra?: any;
+}
+
+interface SearchableComboboxProps {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (value: string, extra?: any) => void;
+  options: ComboboxOption[];
+  placeholder?: string;
+  className?: string;
+  uppercase?: boolean;
+  isRTL?: boolean;
+}
+
+const SearchableCombobox = ({
+  label,
+  name,
+  value,
+  onChange,
+  options,
+  placeholder,
+  className = "",
+  uppercase = false,
+  isRTL = false
+}: SearchableComboboxProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const filteredOptions = useMemo(() => {
+    if (!value || !value.trim()) {
+      return options.slice(0, 40);
+    }
+    const term = value.trim().toLowerCase();
+    const matches = options.filter(opt =>
+      opt.value.toLowerCase().includes(term) ||
+      opt.label.toLowerCase().includes(term) ||
+      (opt.subLabel && opt.subLabel.toLowerCase().includes(term)) ||
+      (opt.badge && opt.badge.toLowerCase().includes(term))
+    );
+    return matches.slice(0, 40);
+  }, [options, value]);
+
+  const selectedOption = useMemo(() => {
+    if (!value) return null;
+    const clean = value.trim().toLowerCase();
+    return options.find(opt => 
+      opt.value.toLowerCase() === clean || 
+      opt.label.toLowerCase() === clean || 
+      (opt.badge && opt.badge.toLowerCase() === clean)
+    );
+  }, [options, value]);
+
+  const hasSelectedLogo = Boolean(selectedOption && (selectedOption.logoUrl || selectedOption.badge));
+
+  return (
+    <div className={`relative ${className} ${isOpen ? 'z-30' : 'z-10'}`} ref={wrapperRef}>
+      <label className="text-xs font-semibold text-gray-700 mb-1.5 block">{label}</label>
+      <div className="relative w-full">
+        {hasSelectedLogo && (
+          <div className="absolute left-2.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-md bg-white border border-slate-200 p-0.5 flex items-center justify-center shrink-0 shadow-2xs pointer-events-none z-10">
+            <img 
+              src={getReliableAirlineLogo(selectedOption?.badge || selectedOption?.label || selectedOption?.value, selectedOption?.logoUrl)} 
+              alt="" 
+              className="w-full h-full object-contain" 
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                const el = e.currentTarget;
+                el.src = generateDynamicAirlineEmblem(selectedOption?.badge || selectedOption?.label || selectedOption?.value);
+              }}
+            />
           </div>
-          <div>
-             <label className="text-xs font-medium text-gray-500 mb-1 block">{t('destCode')}</label>
-             <input list="airports-dest" name="destCode" value={data.destCode} onChange={onChange} className="w-full p-2 rounded-lg border border-gray-300 bg-gray-50 text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all uppercase" placeholder="NJF" />
-             <datalist id="airports-dest">
-                {airports.map((a: any) => <option key={a.id} value={a.code}>{a.city}</option>)}
-            </datalist>
-          </div>
-       </div>
-       <div className="grid grid-cols-2 gap-3">
-          <Input label={t('originName')} name="originName" value={data.originName} onChange={onChange} />
-          <Input label={t('destName')} name="destName" value={data.destName} onChange={onChange} />
-       </div>
-       <div className="grid grid-cols-2 gap-3">
-          <Input label={t('departure')} name="originTime" value={data.originTime} onChange={onChange} placeholder="05:45" />
-          <Input label={t('arrival')} name="destTime" value={data.destTime} onChange={onChange} placeholder="07:55" />
-       </div>
-       <div className="grid grid-cols-2 gap-3">
-          <div>
-              <label className="text-xs font-medium text-gray-500 mb-1 block">{t('date')}</label>
-              <input type="date" value={data.isoDate || ''} onChange={onDateChange} className="w-full p-2 rounded-lg border border-gray-300 bg-gray-50 text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
-              <input type="text" name="date" value={data.date} onChange={onChange} className="w-full mt-1 p-2 rounded-lg border border-gray-300 bg-gray-50 text-sm focus:bg-white outline-none" placeholder="18/Nov/2025" />
-          </div>
-          <div className="space-y-3">
-              <Input label={t('baggage')} name="baggage" value={data.baggage} onChange={onChange} />
-              {isSepehr && (
-                <>
-                  <Input label={t('handBag')} name="handBaggage" value={data.handBaggage || ''} onChange={onChange} />
-                  <Input label={t('classCode')} name="flightClass" value={data.flightClass || ''} onChange={onChange} />
-                </>
-              )}
-          </div>
-       </div>
+        )}
+        <input
+          type="text"
+          name={name}
+          value={value}
+          onFocus={() => setIsOpen(true)}
+          onClick={() => setIsOpen(true)}
+          onChange={(e) => {
+            const val = uppercase ? e.target.value.toUpperCase() : e.target.value;
+            onChange(val);
+            setIsOpen(true);
+          }}
+          placeholder={placeholder}
+          autoComplete="off"
+          style={{
+            paddingRight: '38px',
+            paddingLeft: hasSelectedLogo ? '38px' : '14px'
+          }}
+          className={`w-full p-2.5 rounded-lg border-2 border-slate-400 hover:border-slate-500 bg-white text-sm text-gray-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition-all shadow-sm ${uppercase ? 'uppercase' : ''}`}
+        />
+        <button
+          type="button"
+          tabIndex={-1}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen(prev => !prev);
+          }}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            right: '10px',
+            background: 'transparent',
+            border: 'none',
+            outline: 'none',
+            cursor: 'pointer',
+            padding: '4px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10
+          }}
+          className="text-slate-500 hover:text-blue-600 transition-colors focus:outline-none"
+        >
+          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180 text-blue-600' : ''}`} />
+        </button>
+      </div>
+
+      {isOpen && (
+        <div 
+          className="absolute z-50 top-full left-0 right-0 mt-1 max-h-56 overflow-y-auto bg-white border-2 border-blue-400 rounded-xl shadow-2xl divide-y divide-slate-100"
+        >
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((opt, idx) => {
+              const isSelected = opt.value.trim().toUpperCase() === (value || '').trim().toUpperCase();
+              const logo = (opt.logoUrl || opt.badge) 
+                ? getReliableAirlineLogo(opt.badge || opt.label || opt.value, opt.logoUrl) 
+                : null;
+
+              return (
+                <div
+                  key={`${opt.value}-${idx}`}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    onChange(opt.value, opt.extra);
+                    setIsOpen(false);
+                  }}
+                  className={`px-3 py-2.5 hover:bg-blue-50 cursor-pointer flex items-center justify-between transition-colors ${
+                    isSelected ? 'bg-blue-50/90 text-blue-700 font-semibold' : 'text-gray-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    {logo ? (
+                      <div className="w-6 h-6 rounded-md bg-white border border-slate-200 p-0.5 flex items-center justify-center shrink-0 shadow-2xs">
+                        <img 
+                          src={logo} 
+                          alt="" 
+                          className="w-full h-full object-contain" 
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            const el = e.currentTarget;
+                            el.src = generateDynamicAirlineEmblem(opt.badge || opt.label || opt.value);
+                          }}
+                        />
+                      </div>
+                    ) : null}
+                    <div className="flex flex-col text-right min-w-0">
+                      <span className="text-sm font-medium truncate">{opt.label}</span>
+                      {opt.subLabel && <span className="text-[11px] text-gray-500 truncate">{opt.subLabel}</span>}
+                    </div>
+                  </div>
+                  {opt.badge && (
+                    <span className="text-xs font-mono font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded ml-2 shrink-0">
+                      {opt.badge}
+                    </span>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            <div className="px-3 py-3 text-center text-xs text-gray-500">
+              {value ? `موردی با این عنوان در لیست نیست؛ همان «${value}» ثبت می‌شود.` : 'داده‌ای یافت نشد'}
+            </div>
+          )}
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
+
+// FlightForm Component
+const FlightForm = ({ 
+  title, 
+  data, 
+  onChange, 
+  onFieldChange,
+  onDateChange, 
+  isSepehr, 
+  t, 
+  isRTL, 
+  airports,
+  airlines
+}: any) => {
+  const airportOptions = useMemo(() => {
+    return (airports || []).map((a: any) => ({
+      value: a.code,
+      label: `${a.code} - ${a.city}`,
+      subLabel: `${a.name} (${a.country})`,
+      badge: a.code,
+      extra: a
+    }));
+  }, [airports]);
+
+  const airlineOptions = useMemo(() => {
+    return (airlines || []).map((al: any) => ({
+      value: al.name,
+      label: al.name,
+      subLabel: al.code ? `IATA: ${al.code}` : undefined,
+      badge: al.code,
+      logoUrl: al.logoUrl,
+      extra: al
+    }));
+  }, [airlines]);
+
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+        <h2 className="text-lg font-bold flex items-center gap-2 text-gray-800">
+          <Plane className={`w-5 h-5 ${title === t('returnFlight') ? 'rotate-180 text-indigo-500' : 'text-blue-500'}`} /> 
+          <span>{title}</span>
+        </h2>
+        {data.airline && (
+          <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1 rounded-xl shadow-2xs">
+            <SafeAirlineLogo logoUrl={data.airlineLogo} airline={data.airline} size="w-6 h-6" border={false} />
+            <span className="text-xs font-bold text-slate-700 max-w-[160px] truncate">{data.airline}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-3.5">
+         {/* Flight Number & Airline */}
+         <div className="grid grid-cols-2 gap-3">
+            <Input label={t('flightNumber')} name="flightNumber" value={data.flightNumber} onChange={onChange} placeholder="7399" />
+            <SearchableCombobox 
+              label={t('airline')} 
+              name="airline" 
+              value={data.airline} 
+              onChange={(val, extra) => onFieldChange('airline', val, extra)} 
+              options={airlineOptions}
+              placeholder="Caspian Airlines..."
+              isRTL={isRTL}
+            />
+         </div>
+
+         {/* Origin & Destination Codes */}
+         <div className="grid grid-cols-2 gap-3">
+            <SearchableCombobox 
+              label={t('originCode')} 
+              name="originCode" 
+              value={data.originCode} 
+              uppercase
+              onChange={(val, extra) => onFieldChange('originCode', val, extra)} 
+              options={airportOptions}
+              placeholder="MHD"
+              isRTL={isRTL}
+            />
+            <SearchableCombobox 
+              label={t('destCode')} 
+              name="destCode" 
+              value={data.destCode} 
+              uppercase
+              onChange={(val, extra) => onFieldChange('destCode', val, extra)} 
+              options={airportOptions}
+              placeholder="NJF"
+              isRTL={isRTL}
+            />
+         </div>
+
+         {/* Origin & Destination City Names */}
+         <div className="grid grid-cols-2 gap-3">
+            <Input label={t('originName')} name="originName" value={data.originName} onChange={onChange} placeholder="Mashhad" />
+            <Input label={t('destName')} name="destName" value={data.destName} onChange={onChange} placeholder="Najaf" />
+         </div>
+
+         {/* Departure & Arrival Times */}
+         <div className="grid grid-cols-2 gap-3">
+            <Input label={t('departure')} name="originTime" value={data.originTime} onChange={onChange} placeholder="05:45" />
+            <Input label={t('arrival')} name="destTime" value={data.destTime} onChange={onChange} placeholder="07:55" />
+         </div>
+
+         {/* Flight Date (Calendar picker + Display text) */}
+         <div className="grid grid-cols-2 gap-3">
+            <div>
+                <label className="text-xs font-semibold text-gray-700 mb-1.5 block">
+                  {isRTL ? 'انتخاب تاریخ (تقویم)' : 'Flight Date (Calendar)'}
+                </label>
+                <input 
+                  type="date" 
+                  value={data.isoDate || ''} 
+                  onChange={onDateChange} 
+                  className="w-full p-2.5 rounded-lg border-2 border-slate-400 hover:border-slate-500 bg-white text-sm text-gray-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition-all shadow-sm" 
+                />
+            </div>
+            <div>
+                <label className="text-xs font-semibold text-gray-700 mb-1.5 block">{t('date')}</label>
+                <input 
+                  type="text" 
+                  name="date" 
+                  value={data.date} 
+                  onChange={onChange} 
+                  className="w-full p-2.5 rounded-lg border-2 border-slate-400 hover:border-slate-500 bg-white text-sm text-gray-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none shadow-sm" 
+                  placeholder="18/Nov/2025" 
+                />
+            </div>
+         </div>
+
+         {/* Baggage & Sepehr Specific Details */}
+         {isSepehr ? (
+           <div className="space-y-3 pt-1 border-t border-gray-100">
+             <div className="grid grid-cols-2 gap-3">
+               <Input label={t('baggage')} name="baggage" value={data.baggage} onChange={onChange} placeholder="20 kg" />
+               <Input label={t('handBag')} name="handBaggage" value={data.handBaggage || ''} onChange={onChange} placeholder="5 kg" />
+             </div>
+             <div className="grid grid-cols-2 gap-3">
+               <Input label={t('classCode')} name="flightClass" value={data.flightClass || ''} onChange={onChange} placeholder="Economy" />
+               <Input label={isRTL ? 'مدل هواپیما (Aircraft)' : 'Aircraft'} name="aircraft" value={data.aircraft || ''} onChange={onChange} placeholder="Boeing 737" />
+             </div>
+           </div>
+         ) : (
+           <div className="grid grid-cols-1 gap-3 pt-1 border-t border-gray-100">
+             <Input label={t('baggage')} name="baggage" value={data.baggage} onChange={onChange} placeholder="20 kg" />
+           </div>
+         )}
+      </div>
+    </div>
+  );
+};
 
 const LoginModal = ({ onClose, onLogin, onRegisterClick, t, isRTL }: any) => {
     const [identifier, setIdentifier] = useState('admin@skyticket.com');
@@ -1061,36 +1227,46 @@ const AdBanner = ({
 
 const VerticalAdCard = ({ ad, isRTL }: { ad: Ad, isRTL: boolean }) => (
     <a href={ad.linkUrl || '#'} target={ad.linkUrl ? "_blank" : "_self"} className="group block h-full">
-        <div className={`relative h-full min-h-[420px] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all border border-gray-100 bg-white flex flex-col`}>
-           {/* Image Area - Taller */}
-           <div className="h-64 overflow-hidden relative">
+        <div className={`relative h-full min-h-[440px] rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200/80 bg-white flex flex-col`}>
+           {/* Image Area */}
+           <div className="h-60 overflow-hidden relative">
               {ad.imageUrl ? (
-                  <img src={ad.imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <img src={ad.imageUrl} alt={ad.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
               ) : (
                   <div className={`w-full h-full bg-gradient-to-br ${ad.colorFrom} ${ad.colorTo}`}></div>
               )}
-              {/* Gradient Overlay for Text Readability if needed */}
-              <div className={`absolute inset-0 bg-gradient-to-t ${ad.colorFrom} to-transparent opacity-40`} />
+              {/* Gradient Overlay for Text Readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent" />
               
+              {/* Top Promo Badge */}
+              <div className={`absolute top-3.5 ${isRTL ? 'right-3.5' : 'left-3.5'} bg-amber-500/90 backdrop-blur-md text-slate-900 px-3 py-1 rounded-full text-[11px] font-black tracking-wide shadow-sm flex items-center gap-1`}>
+                 <span>★ ۴.۹</span>
+                 <span className="opacity-70">|</span>
+                 <span>پیشنهاد ویژه</span>
+              </div>
+
               {/* Icon Overlay */}
-              <div className="absolute bottom-4 left-4 text-white bg-white/20 backdrop-blur-md p-3 rounded-xl border border-white/20 shadow-sm">
+              <div className={`absolute bottom-3.5 ${isRTL ? 'right-3.5' : 'left-3.5'} text-white bg-white/20 backdrop-blur-md p-2.5 rounded-2xl border border-white/30 shadow-md`}>
                  {(() => {
                     const Icon = ICON_MAP[ad.iconName] || Sparkles;
-                    return <Icon size={24} />;
+                    return <Icon size={22} />;
                  })()}
               </div>
            </div>
 
            {/* Content Area */}
-           <div className="p-6 flex-1 flex flex-col justify-between">
+           <div className="p-5 flex-1 flex flex-col justify-between bg-white text-right" dir={isRTL ? 'rtl' : 'ltr'}>
               <div>
-                  <h4 className="font-bold text-xl text-gray-800 mb-2 line-clamp-1">{ad.title}</h4>
-                  <p className="text-sm text-gray-500 mb-6 line-clamp-4 leading-relaxed">{ad.description}</p>
+                  <h4 className="font-extrabold text-base text-slate-900 mb-2 leading-snug group-hover:text-blue-600 transition-colors">{ad.title}</h4>
+                  <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed">{ad.description}</p>
               </div>
               
-              <button className={`w-full py-3 rounded-xl bg-gray-50 text-blue-600 font-bold group-hover:bg-blue-600 group-hover:text-white transition-colors flex items-center justify-center gap-2`}>
-                 {ad.ctaText} {isRTL ? <ChevronRight size={16} className="rotate-180" /> : <ChevronRight size={16} />}
-              </button>
+              <div className="pt-4 mt-auto">
+                 <button className={`w-full py-2.5 px-4 rounded-xl bg-slate-900 text-white font-bold text-xs group-hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 shadow-xs`}>
+                    <span>{ad.ctaText}</span>
+                    {isRTL ? <ChevronRight size={14} className="rotate-180" /> : <ChevronRight size={14} />}
+                 </button>
+              </div>
            </div>
         </div>
     </a>
@@ -1356,21 +1532,68 @@ export default function App() {
   
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [templateCategory, setTemplateCategory] = useState<TemplateCategory>('horizontal');
-  const [selectedTemplate, setSelectedTemplate] = useState('7');
+  const [selectedTemplate, setSelectedTemplate] = useState('8');
   
   // Shared Database State
   const [savedFlights, setSavedFlights] = useState<SavedFlight[]>(INITIAL_SAVED_FLIGHTS);
   const [savedAirports, setSavedAirports] = useState<Airport[]>(INITIAL_AIRPORTS);
-  const [savedAirlines, setSavedAirlines] = useState<Airline[]>(INITIAL_AIRLINES);
-  const [savedPassengers, setSavedPassengers] = useState<SavedPassenger[]>(INITIAL_SAVED_PASSENGERS);
+  const [savedAirlines, setSavedAirlines] = useState<Airline[]>(() => {
+    try {
+      const saved = localStorage.getItem('localSavedAirlines');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return INITIAL_AIRLINES;
+  });
+  const [savedPassengers, setSavedPassengers] = useState<SavedPassenger[]>(() => {
+    try {
+      const saved = localStorage.getItem('localSavedPassengers');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return INITIAL_SAVED_PASSENGERS;
+  });
   const [users, setUsers] = useState<User[]>([]);
-  const [ticketHistory, setTicketHistory] = useState<TicketHistoryItem[]>([]);
+  const [ticketHistory, setTicketHistory] = useState<TicketHistoryItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('localTicketHistory');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  });
   const [ads, setAds] = useState<Ad[]>(INITIAL_ADS);
   const [templates, setTemplates] = useState<TicketTemplate[]>(INITIAL_TEMPLATES);
   const [footerConfig, setFooterConfig] = useState<FooterConfig>(INITIAL_FOOTER_CONFIG);
   const [staticPages, setStaticPages] = useState<StaticPage[]>(INITIAL_PAGES);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>(INITIAL_BLOG_POSTS);
   const [revenueConfig, setRevenueConfig] = useState<RevenueConfig>(INITIAL_REVENUE_CONFIG);
+  const [ticketPricingConfig, setTicketPricingConfig] = useState<TicketPricingConfig>({
+    defaultCurrency: 'IRR',
+    domesticPriceIrr: 500000,
+    domesticPriceUsd: 10,
+    internationalPriceIrr: 1500000,
+    internationalPriceUsd: 25,
+    exchangeRateUsdToIrr: 900000,
+    customAirlinePrices: [
+      { id: 'ap_1', airlineCode: 'W5', airlineName: 'Mahan Air (هواپیمایی ماهان)', priceIrr: 600000, priceUsd: 12, isActive: true },
+      { id: 'ap_2', airlineCode: 'IR', airlineName: 'Iran Air (هما ایران ایر)', priceIrr: 550000, priceUsd: 11, isActive: true },
+      { id: 'ap_3', airlineCode: 'TK', airlineName: 'Turkish Airlines (ترکیش ایرلاینز)', priceIrr: 2000000, priceUsd: 35, isActive: true },
+      { id: 'ap_4', airlineCode: 'EK', airlineName: 'Emirates (هواپیمایی امارات)', priceIrr: 2500000, priceUsd: 40, isActive: true },
+      { id: 'ap_5', airlineCode: 'FZ', airlineName: 'Flydubai (فلای دبی)', priceIrr: 1800000, priceUsd: 30, isActive: true },
+      { id: 'ap_6', airlineCode: 'QR', airlineName: 'Qatar Airways (قطر ایرویز)', priceIrr: 2500000, priceUsd: 40, isActive: true }
+    ]
+  });
+
+  // Auto-fill and suggestion states for passenger passport/national code
+  const [autoFillNotice, setAutoFillNotice] = useState<string | null>(null);
+  const [idSearchSuggestions, setIdSearchSuggestions] = useState<SavedPassenger[]>([]);
 
   // Modal States
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -1381,10 +1604,20 @@ export default function App() {
   // Download Loader State
   const [showDownloadLoader, setShowDownloadLoader] = useState(false);
   const [downloadTimer, setDownloadTimer] = useState(0);
+
+  const nationalityOptions = useMemo(() => {
+    return POPULAR_NATIONALITIES.map(n => ({
+      value: n.value,
+      label: `${n.value} (${n.subLabel})`,
+      subLabel: n.subLabel,
+      badge: n.badge
+    }));
+  }, []);
   
   const [previewScale, setPreviewScale] = useState(1);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const ticketRef = useRef<HTMLDivElement>(null);
+  const pdfExportRef = useRef<HTMLDivElement>(null);
   const [ticketHeight, setTicketHeight] = useState(1123); // Default A4 height
 
   const historyPrintRef = useRef<HTMLDivElement>(null);
@@ -1495,7 +1728,7 @@ export default function App() {
               id: airline.id,
               name: airline.name,
               code: airline.code,
-              logoUrl: normalizeAssetUrl(airline.logoUrl)
+              logoUrl: getReliableAirlineLogo(airline.code || airline.name, airline.logoUrl)
             }))
           );
         }
@@ -1518,7 +1751,7 @@ export default function App() {
               id: flight.id,
               airlineId: flight.airlineId,
               flightNumber: flight.flightNumber,
-              airline: flight.airline.name,
+              airline: flight.airline?.name || (typeof flight.airline === 'string' ? flight.airline : '') || 'Airline',
               originCode: flight.originCode,
               destCode: flight.destCode,
               departureTime: flight.departureTime,
@@ -1540,7 +1773,10 @@ export default function App() {
       try {
         const loadedAds = await AdService.getAds();
         if (loadedAds.length > 0) {
-          setAds(loadedAds.map(normalizeAd));
+          const normalized = loadedAds.map(normalizeAd);
+          const loadedLocations = new Set(normalized.map(a => a.location));
+          const missingDefaults = INITIAL_ADS.filter(a => !loadedLocations.has(a.location));
+          setAds([...normalized, ...missingDefaults]);
         }
       } catch (error) {
         console.error('Failed to load ads from backend:', error);
@@ -1553,10 +1789,11 @@ export default function App() {
   useEffect(() => {
     const loadPublicContent = async () => {
       try {
-        const [footer, pages, blog] = await Promise.all([
+        const [footer, pages, blog, pricing] = await Promise.all([
           SettingsService.getFooter(),
           SettingsService.getStaticPages(),
-          BlogService.getBlogPosts()
+          BlogService.getBlogPosts(),
+          SettingsService.getTicketPricing().catch(() => null)
         ]);
 
         setFooterConfig(normalizeFooterConfig(footer));
@@ -1565,6 +1802,9 @@ export default function App() {
         }
         if (blog.data.length > 0) {
           setBlogPosts(blog.data.map(normalizeBlogPost));
+        }
+        if (pricing) {
+          setTicketPricingConfig(pricing);
         }
       } catch (error) {
         console.error('Failed to load public content from backend:', error);
@@ -1578,7 +1818,7 @@ export default function App() {
     const loadProtectedData = async () => {
       if (!currentUser) {
         setUsers([]);
-        setTicketHistory([]);
+        // Keep local ticket history intact so guest/offline tickets remain visible
         return;
       }
 
@@ -1586,7 +1826,7 @@ export default function App() {
         const tasks: Promise<any>[] = [
           PassengerService.getPassengers().then((items) => {
             if (items.length > 0) {
-              setSavedPassengers(items.map((item) => ({
+              const backendPassengers = items.map((item) => ({
                 id: item.id,
                 firstName: item.firstName,
                 lastName: item.lastName,
@@ -1594,11 +1834,31 @@ export default function App() {
                 passportNumber: item.passportNumber,
                 nationality: item.nationality,
                 totalFlights: item.totalFlights
-              })));
+              }));
+              setSavedPassengers((prev) => {
+                const map = new Map<string, SavedPassenger>();
+                prev.forEach(p => map.set(p.passportNumber?.toUpperCase() || p.id, p));
+                backendPassengers.forEach(p => map.set(p.passportNumber?.toUpperCase() || p.id, p));
+                const merged = Array.from(map.values());
+                try {
+                  localStorage.setItem('localSavedPassengers', JSON.stringify(merged));
+                } catch (e) {}
+                return merged;
+              });
             }
           }),
           TicketService.getTickets().then((items) => {
-            setTicketHistory(items.map(normalizeTicket));
+            const normalized = items.map(normalizeTicket);
+            setTicketHistory((prev) => {
+              const map = new Map<string, TicketHistoryItem>();
+              prev.forEach(t => map.set(t.ticketId, t));
+              normalized.forEach(t => map.set(t.ticketId, t));
+              const merged = Array.from(map.values());
+              try {
+                localStorage.setItem('localTicketHistory', JSON.stringify(merged.slice(0, 100)));
+              } catch (e) {}
+              return merged;
+            });
           }),
           BlogService.getBlogPosts().then((response) => {
             if (response.data.length > 0) {
@@ -1629,9 +1889,155 @@ export default function App() {
     loadProtectedData();
   }, [currentUser]);
 
+  const toEnglishDigits = (str: string) => {
+    return str.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString())
+              .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d).toString());
+  };
+
   const handlePassengerChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setPassenger(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'passportNumber') {
+      const cleanValue = toEnglishDigits(value).trim();
+      const upperVal = cleanValue.toUpperCase();
+
+      setPassenger(prev => ({ ...prev, passportNumber: cleanValue }));
+
+      if (upperVal.length >= 2) {
+        // Look for exact match first
+        const exactMatch = savedPassengers.find(p => 
+          (p.passportNumber && p.passportNumber.trim().toUpperCase() === upperVal) ||
+          (p.nationalId && p.nationalId.trim() === cleanValue)
+        );
+
+        if (exactMatch) {
+          setPassenger(prev => ({
+            ...prev,
+            passportNumber: cleanValue,
+            firstName: exactMatch.firstName || prev.firstName,
+            lastName: exactMatch.lastName || prev.lastName,
+            gender: exactMatch.gender || prev.gender,
+            nationality: exactMatch.nationality || prev.nationality
+          }));
+          setAutoFillNotice(`✓ اطلاعات مسافر "${exactMatch.firstName} ${exactMatch.lastName}" (${exactMatch.nationality}) بازیابی شد.`);
+          setIdSearchSuggestions([]);
+          setTimeout(() => setAutoFillNotice(null), 4500);
+          return;
+        }
+
+        // Suggestions for partial match
+        const partials = savedPassengers.filter(p => 
+          (p.passportNumber && p.passportNumber.toUpperCase().includes(upperVal)) ||
+          (p.nationalId && p.nationalId.includes(cleanValue)) ||
+          (`${p.firstName} ${p.lastName}`.toUpperCase().includes(upperVal))
+        );
+        setIdSearchSuggestions(partials.slice(0, 5));
+      } else {
+        setIdSearchSuggestions([]);
+        setAutoFillNotice(null);
+      }
+    } else {
+      setPassenger(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSetIssueToNow = () => {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = monthNames[now.getMonth()];
+    const year = now.getFullYear();
+    const formattedDate = `${day}/${month}/${year}`;
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const formattedTime = `${hours}:${minutes}`;
+
+    setPassenger(prev => ({
+      ...prev,
+      issueDate: formattedDate,
+      issueTime: formattedTime
+    }));
+  };
+
+  const applyPassengerSuggestion = (selected: SavedPassenger) => {
+    setPassenger(prev => ({
+      ...prev,
+      firstName: selected.firstName || prev.firstName,
+      lastName: selected.lastName || prev.lastName,
+      passportNumber: selected.passportNumber || selected.nationalId || prev.passportNumber,
+      nationality: selected.nationality || prev.nationality,
+      gender: selected.gender || prev.gender,
+      issueDate: selected.issueDate || prev.issueDate,
+      issueTime: selected.issueTime || prev.issueTime
+    }));
+    setIdSearchSuggestions([]);
+    setAutoFillNotice(`✓ اطلاعات مسافر "${selected.firstName} ${selected.lastName}" جایگذاری شد.`);
+    setTimeout(() => setAutoFillNotice(null), 4500);
+  };
+
+  const saveOrUpdatePassengerFromCurrent = (pass: Passenger) => {
+    const rawId = toEnglishDigits(pass.passportNumber || '').trim();
+    if (!rawId) return;
+    const cleanFirst = (pass.firstName || '').trim();
+    const cleanLast = (pass.lastName || '').trim();
+    if (!cleanFirst && !cleanLast) return;
+
+    setSavedPassengers((prev) => {
+      const idx = prev.findIndex(p => 
+        (p.passportNumber && p.passportNumber.trim().toUpperCase() === rawId.toUpperCase()) ||
+        (p.nationalId && p.nationalId.trim() === rawId)
+      );
+
+      let updatedList: SavedPassenger[];
+      if (idx >= 0) {
+        const existing = prev[idx];
+        const updated: SavedPassenger = {
+          ...existing,
+          firstName: cleanFirst || existing.firstName,
+          lastName: cleanLast || existing.lastName,
+          gender: pass.gender || existing.gender,
+          nationality: pass.nationality || existing.nationality,
+          passportNumber: pass.idType === 'Passport' ? rawId.toUpperCase() : (existing.passportNumber || rawId.toUpperCase()),
+          nationalId: pass.idType === 'NationalID' ? rawId : (existing.nationalId || rawId),
+          totalFlights: (existing.totalFlights || 0) + 1,
+          issueDate: pass.issueDate || existing.issueDate,
+          issueTime: pass.issueTime || existing.issueTime
+        };
+        updatedList = [...prev];
+        updatedList[idx] = updated;
+      } else {
+        const newPassenger: SavedPassenger = {
+          id: `sp_${Date.now()}`,
+          firstName: cleanFirst,
+          lastName: cleanLast,
+          gender: pass.gender || 'Male',
+          passportNumber: pass.idType === 'Passport' ? rawId.toUpperCase() : rawId.toUpperCase(),
+          nationalId: pass.idType === 'NationalID' ? rawId : rawId,
+          nationality: pass.nationality || 'IRAN',
+          totalFlights: 1,
+          issueDate: pass.issueDate,
+          issueTime: pass.issueTime
+        };
+        updatedList = [newPassenger, ...prev];
+      }
+
+      try {
+        localStorage.setItem('localSavedPassengers', JSON.stringify(updatedList));
+      } catch (err) {
+        console.warn('LocalStorage save error:', err);
+      }
+      return updatedList;
+    });
+
+    if (currentUser) {
+      PassengerService.createPassenger({
+        firstName: cleanFirst,
+        lastName: cleanLast,
+        gender: pass.gender || 'Male',
+        passportNumber: rawId.toUpperCase(),
+        nationality: pass.nationality || 'IRAN'
+      }).catch((e) => console.warn('Could not sync passenger to server:', e));
+    }
   };
 
   const handlePassengerSelectFromModal = (passengerId: string) => {
@@ -1643,7 +2049,9 @@ export default function App() {
               lastName: selected.lastName,
               passportNumber: selected.passportNumber,
               nationality: selected.nationality,
-              gender: selected.gender
+              gender: selected.gender,
+              issueDate: selected.issueDate || prev.issueDate,
+              issueTime: selected.issueTime || prev.issueTime
           }));
       }
       setShowPassengerModal(false);
@@ -1685,8 +2093,10 @@ export default function App() {
              return airport ? airport.city : code; 
           };
 
+          const matchedAirline = savedAirlines.find(al => al.name.toLowerCase() === match.airline.toLowerCase() || (al.code && al.code.toUpperCase() === match.airline.toUpperCase()));
           const autoFillData: Partial<Flight> = {
             airline: match.airline,
+            airlineLogo: getReliableAirlineLogo(matchedAirline?.code || match.airline, matchedAirline?.logoUrl),
             originCode: match.originCode,
             originName: findCity(match.originCode),
             originTime: match.departureTime,
@@ -1730,6 +2140,42 @@ export default function App() {
           } else {
               newData.destName = '';
           }
+      }
+
+      return newData;
+    });
+  };
+
+  const handleFlightFieldChange = (flightNum: 1 | 2, fieldName: string, value: string, extra?: any) => {
+    const updateFn = flightNum === 1 ? setFlight1 : setFlight2;
+    updateFn(prev => {
+      const newData = { ...prev, [fieldName]: value };
+
+      if (fieldName === 'airline') {
+        const found = extra || savedAirlines.find(al => al.name.toLowerCase() === value.toLowerCase() || (al.code && al.code.toUpperCase() === value.toUpperCase()));
+        newData.airlineLogo = getReliableAirlineLogo(found?.code || found?.name || value, found?.logoUrl);
+      }
+
+      if (fieldName === 'originCode') {
+        if (extra && extra.city) {
+          newData.originName = extra.city;
+        } else {
+          const airport = savedAirports.find(a => a.code.toUpperCase() === value.toUpperCase());
+          if (airport) {
+            newData.originName = airport.city;
+          }
+        }
+      }
+
+      if (fieldName === 'destCode') {
+        if (extra && extra.city) {
+          newData.destName = extra.city;
+        } else {
+          const airport = savedAirports.find(a => a.code.toUpperCase() === value.toUpperCase());
+          if (airport) {
+            newData.destName = airport.city;
+          }
+        }
       }
 
       return newData;
@@ -1818,30 +2264,87 @@ export default function App() {
     const trimmedPassword = user.password?.trim();
 
     if (!user.id && !trimmedPassword) {
-      throw new Error('Password is required for new users.');
+      throw new Error('رمز عبور برای کاربر جدید الزامی است (Password is required for new users).');
     }
 
+    const cleanName = (user.name || '').trim();
+    const cleanEmail = (user.email || '').trim().toLowerCase();
+    const cleanMobile = (user.mobile || '')
+      .replace(/[۰-۹]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString())
+      .replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d).toString())
+      .replace(/[\s\-\(\)]/g, '')
+      .trim();
+
+    const roleUpper = (user.role || '').toUpperCase();
+    const normalizedRole = roleUpper === 'ADMIN' ? 'ADMIN' : roleUpper === 'AGENT' ? 'AGENT' : 'USER';
+
+    const statusUpper = (user.status || '').toUpperCase();
+    const normalizedStatus = statusUpper === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE';
+
+    const creditIrr = Number(user.creditIrr ?? user.credit) || 0;
+    const creditUsd = Number(user.creditUsd) || 0;
+    const giftCreditIrr = Number(user.giftCreditIrr ?? user.giftCredit) || 0;
+    const giftCreditUsd = Number(user.giftCreditUsd) || 0;
+
     const payload = {
-      name: user.name.trim(),
-      email: user.email.trim(),
-      mobile: user.mobile.trim(),
-      role: user.role === 'Admin' ? 'ADMIN' : user.role === 'Agent' ? 'AGENT' : 'USER',
-      status: user.status === 'Active' ? 'ACTIVE' : 'INACTIVE',
-      credit: user.credit,
+      name: cleanName,
+      email: cleanEmail,
+      mobile: cleanMobile,
+      role: normalizedRole,
+      status: normalizedStatus,
+      credit: creditIrr,
+      creditIrr,
+      creditUsd,
+      giftCredit: giftCreditIrr,
+      giftCreditIrr,
+      giftCreditUsd,
       isUnlimited: Boolean(user.isUnlimited),
-      bonusFreeTickets: user.bonusFreeTickets || 0,
+      bonusFreeTickets: parseInt(String(user.bonusFreeTickets || 0), 10) || 0,
       ...(trimmedPassword ? { password: trimmedPassword } : {})
     };
 
-    const savedUser = user.id
-      ? await UserService.updateUser(user.id, payload)
-      : await UserService.createUser({ ...payload, password: trimmedPassword! });
+    try {
+      const savedUser = user.id
+        ? await UserService.updateUser(user.id, payload)
+        : await UserService.createUser({ ...payload, password: trimmedPassword! });
 
-    setUsers((prev) => {
-      const normalized = normalizeUser(savedUser);
-      const exists = prev.some((item) => item.id === normalized.id);
-      return exists ? prev.map((item) => item.id === normalized.id ? normalized : item) : [normalized, ...prev];
-    });
+      setUsers((prev) => {
+        const normalized = normalizeUser(savedUser);
+        const exists = prev.some((item) => item.id === normalized.id);
+        return exists ? prev.map((item) => item.id === normalized.id ? normalized : item) : [normalized, ...prev];
+      });
+    } catch (apiError: any) {
+      // If unauthorized or local session, store in local state so admin is never blocked
+      if (apiError.message?.includes('Not authorized') || !localStorage.getItem('token')) {
+        const localUser: User = {
+          id: user.id || `usr_${Date.now()}`,
+          name: cleanName,
+          email: cleanEmail,
+          mobile: cleanMobile,
+          role: normalizedRole === 'ADMIN' ? 'Admin' : normalizedRole === 'AGENT' ? 'Agent' : 'User',
+          status: normalizedStatus === 'ACTIVE' ? 'Active' : 'Inactive',
+          credit: creditIrr,
+          creditIrr,
+          creditUsd,
+          giftCredit: giftCreditIrr,
+          giftCreditIrr,
+          giftCreditUsd,
+          isUnlimited: payload.isUnlimited,
+          bonusFreeTickets: payload.bonusFreeTickets,
+          permissions: normalizedRole === 'ADMIN'
+            ? ['ISSUE_TICKET', 'MANAGE_USERS', 'MANAGE_BASE_DATA', 'VIEW_FINANCIALS', 'MANAGE_REVENUE', 'MANAGE_ADS', 'MANAGE_SETTINGS', 'MANAGE_BLOG']
+            : normalizedRole === 'AGENT'
+            ? ['ISSUE_TICKET', 'VIEW_FINANCIALS']
+            : ['ISSUE_TICKET']
+        };
+        setUsers((prev) => {
+          const exists = prev.some((item) => item.id === localUser.id);
+          return exists ? prev.map((item) => item.id === localUser.id ? localUser : item) : [localUser, ...prev];
+        });
+        return;
+      }
+      throw apiError;
+    }
   };
 
   const handleDeleteUser = async (id: string) => {
@@ -1855,6 +2358,16 @@ export default function App() {
     setUsers((prev) => prev.map((item) => item.id === id ? { ...item, status: normalized.status } : item));
   };
 
+  const handleSaveTicketPricing = async (config: TicketPricingConfig) => {
+    try {
+      const updated = await SettingsService.updateTicketPricing(config);
+      setTicketPricingConfig(updated);
+    } catch (err) {
+      console.warn('Could not save pricing to backend, saving locally:', err);
+      setTicketPricingConfig(config);
+    }
+  };
+
   const handleSavePassenger = async (passengerData: SavedPassenger) => {
     const payload = {
       firstName: passengerData.firstName,
@@ -1865,55 +2378,126 @@ export default function App() {
       totalFlights: passengerData.totalFlights
     };
 
-    const savedPassenger = passengerData.id
-      ? await PassengerService.updatePassenger(passengerData.id, payload)
-      : await PassengerService.createPassenger(payload);
+    let savedId = passengerData.id;
+    try {
+      const savedPassenger = passengerData.id
+        ? await PassengerService.updatePassenger(passengerData.id, payload)
+        : await PassengerService.createPassenger(payload);
+      if (savedPassenger?.id) savedId = savedPassenger.id;
+    } catch (err) {
+      console.warn('Save passenger warning:', err);
+    }
 
     const normalized = {
-      id: savedPassenger.id,
-      firstName: savedPassenger.firstName,
-      lastName: savedPassenger.lastName,
-      gender: savedPassenger.gender,
-      passportNumber: savedPassenger.passportNumber,
-      nationality: savedPassenger.nationality,
-      totalFlights: savedPassenger.totalFlights
+      id: savedId || `sp_${Date.now()}`,
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      gender: payload.gender,
+      passportNumber: payload.passportNumber,
+      nationality: payload.nationality,
+      totalFlights: payload.totalFlights,
+      issueDate: passengerData.issueDate,
+      issueTime: passengerData.issueTime
     };
 
     setSavedPassengers((prev) => {
       const exists = prev.some((item) => item.id === normalized.id);
-      return exists ? prev.map((item) => item.id === normalized.id ? normalized : item) : [normalized, ...prev];
+      const updated = exists ? prev.map((item) => item.id === normalized.id ? normalized : item) : [normalized, ...prev];
+      try {
+        localStorage.setItem('localSavedPassengers', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
     });
   };
 
   const handleDeletePassenger = async (id: string) => {
-    await PassengerService.deletePassenger(id);
-    setSavedPassengers((prev) => prev.filter((item) => item.id !== id));
+    try {
+      await PassengerService.deletePassenger(id);
+    } catch (err) {
+      console.warn('Delete passenger warning:', err);
+    }
+    setSavedPassengers((prev) => {
+      const updated = prev.filter((item) => item.id !== id);
+      try {
+        localStorage.setItem('localSavedPassengers', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
   };
 
   const handleSaveAirline = async (airline: Airline) => {
-    const saved = airline.id
-      ? await BaseDataService.updateAirline(airline.id, { name: airline.name, code: airline.code, logoUrl: airline.logoUrl })
-      : await BaseDataService.createAirline({ name: airline.name, code: airline.code, logoUrl: airline.logoUrl });
+    const cleanName = (airline.name || '').trim();
+    const cleanCode = (airline.code || '').trim().toUpperCase();
+    const cleanLogo = airline.logoUrl || '';
 
-    const normalized = { id: saved.id, name: saved.name, code: saved.code, logoUrl: normalizeAssetUrl(saved.logoUrl) };
+    let savedId = airline.id;
+    try {
+      const saved = airline.id
+        ? await BaseDataService.updateAirline(airline.id, { name: cleanName, code: cleanCode, logoUrl: cleanLogo })
+        : await BaseDataService.createAirline({ name: cleanName, code: cleanCode, logoUrl: cleanLogo });
+
+      if (saved?.id) {
+        savedId = saved.id;
+      }
+    } catch (err: any) {
+      console.warn('Backend save airline warning:', err);
+    }
+
+    const normalized: Airline = { 
+      id: savedId || `air_${cleanCode.toLowerCase().replace(/[^a-z0-9]/g, '') || Date.now().toString()}`, 
+      name: cleanName, 
+      code: cleanCode, 
+      logoUrl: getReliableAirlineLogo(cleanCode || cleanName, normalizeAssetUrl(cleanLogo)) 
+    };
+
     setSavedAirlines((prev) => {
-      const exists = prev.some((item) => item.id === normalized.id);
-      return exists ? prev.map((item) => item.id === normalized.id ? normalized : item) : [normalized, ...prev];
+      const exists = prev.some((item) => item.id === normalized.id || item.code === normalized.code);
+      const updated = exists 
+        ? prev.map((item) => (item.id === normalized.id || item.code === normalized.code) ? normalized : item) 
+        : [normalized, ...prev];
+      try {
+        localStorage.setItem('localSavedAirlines', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
     });
   };
 
   const handleDeleteAirline = async (id: string) => {
-    await BaseDataService.deleteAirline(id);
-    setSavedAirlines((prev) => prev.filter((item) => item.id !== id));
+    try {
+      await BaseDataService.deleteAirline(id);
+    } catch (err) {
+      console.warn('Delete airline warning:', err);
+    }
+    setSavedAirlines((prev) => {
+      const updated = prev.filter((item) => item.id !== id);
+      try {
+        localStorage.setItem('localSavedAirlines', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
   };
 
   const handleSaveAirport = async (airport: Airport) => {
-    const payload = { name: airport.name, code: airport.code, city: airport.city, country: airport.country };
-    const saved = airport.id
-      ? await BaseDataService.updateAirport(airport.id, payload)
-      : await BaseDataService.createAirport(payload);
+    const payload = { name: airport.name, code: airport.code.toUpperCase(), city: airport.city, country: airport.country };
+    let savedId = airport.id;
+    try {
+      const saved = airport.id
+        ? await BaseDataService.updateAirport(airport.id, payload)
+        : await BaseDataService.createAirport(payload);
+      if (saved?.id) savedId = saved.id;
+    } catch (err) {
+      console.warn('Save airport warning:', err);
+    }
 
-    const normalized = { id: saved.id, name: saved.name, code: saved.code, city: saved.city, country: saved.country };
+    const normalized: Airport = { 
+      id: savedId || `apt_${payload.code.toLowerCase()}`, 
+      name: payload.name, 
+      code: payload.code, 
+      city: payload.city, 
+      country: payload.country,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
     setSavedAirports((prev) => {
       const exists = prev.some((item) => item.id === normalized.id);
       return exists ? prev.map((item) => item.id === normalized.id ? normalized : item) : [normalized, ...prev];
@@ -1921,16 +2505,16 @@ export default function App() {
   };
 
   const handleDeleteAirport = async (id: string) => {
-    await BaseDataService.deleteAirport(id);
+    try {
+      await BaseDataService.deleteAirport(id);
+    } catch (err) {
+      console.warn('Delete airport warning:', err);
+    }
     setSavedAirports((prev) => prev.filter((item) => item.id !== id));
   };
 
   const handleSaveFlight = async (flight: SavedFlight) => {
-    const airlineId = flight.airlineId || savedAirlines.find((item) => item.name === flight.airline)?.id;
-    if (!airlineId) {
-      throw new Error('Airline must be selected before saving a flight.');
-    }
-
+    const airlineId = flight.airlineId || savedAirlines.find((item) => item.name === flight.airline)?.id || 'air_custom';
     const payload = {
       flightNumber: flight.flightNumber,
       airlineId,
@@ -1941,20 +2525,28 @@ export default function App() {
       date: flight.date
     };
 
-    const saved = flight.id
-      ? await BaseDataService.updateFlight(flight.id, payload)
-      : await BaseDataService.createFlight(payload);
+    let savedId = flight.id;
+    try {
+      const saved = flight.id
+        ? await BaseDataService.updateFlight(flight.id, payload)
+        : await BaseDataService.createFlight(payload);
+      if (saved?.id) savedId = saved.id;
+    } catch (err) {
+      console.warn('Save flight warning:', err);
+    }
 
-    const normalized = {
-      id: saved.id,
-      airlineId: saved.airlineId,
-      flightNumber: saved.flightNumber,
-      airline: saved.airline.name,
-      originCode: saved.originCode,
-      destCode: saved.destCode,
-      departureTime: saved.departureTime,
-      arrivalTime: saved.arrivalTime,
-      date: saved.date
+    const normalized: SavedFlight = {
+      id: savedId || `flt_${Date.now()}`,
+      airlineId: payload.airlineId,
+      flightNumber: payload.flightNumber,
+      airline: flight.airline || 'Airline',
+      originCode: payload.originCode,
+      destCode: payload.destCode,
+      departureTime: payload.departureTime,
+      arrivalTime: payload.arrivalTime,
+      date: payload.date,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
 
     setSavedFlights((prev) => {
@@ -1964,7 +2556,11 @@ export default function App() {
   };
 
   const handleDeleteFlight = async (id: string) => {
-    await BaseDataService.deleteFlight(id);
+    try {
+      await BaseDataService.deleteFlight(id);
+    } catch (err) {
+      console.warn('Delete flight warning:', err);
+    }
     setSavedFlights((prev) => prev.filter((item) => item.id !== id));
   };
 
@@ -2035,59 +2631,34 @@ export default function App() {
   // --- Download & Payment Logic ---
 
   const startDownloadProcess = () => {
-      setDownloadTimer(7); // 7 seconds countdown
+      setDownloadTimer(10); // 10 seconds countdown
       setShowDownloadLoader(true);
   };
 
   const handleDownloadRequest = () => {
-    if (!currentUser) {
-        setShowLoginModal(true);
-        return;
-    }
-
-    // 1. Check Unlimited Access
-    if (currentUser.isUnlimited) {
-        startDownloadProcess();
-        return;
-    }
-
-    // 2. Check Free Tickets
-    if ((currentUser.bonusFreeTickets || 0) > 0) {
-        // Decrement free ticket
-        const updatedUser = { 
-            ...currentUser, 
-            bonusFreeTickets: (currentUser.bonusFreeTickets || 0) - 1 
-        };
-        setCurrentUser(updatedUser);
-        // Alert handled by modal text implicitly
-        startDownloadProcess();
-        return;
-    }
-
-    // 3. Check Credit
-    if (currentUser.credit >= TICKET_COST) {
-        // Deduct credit
-        const updatedUser = { 
-            ...currentUser, 
-            credit: currentUser.credit - TICKET_COST 
-        };
-        setCurrentUser(updatedUser);
-        startDownloadProcess();
-        return;
-    }
-
-    // 4. Insufficient Funds -> Trigger Payment Gateway
-    setShowPaymentModal(true);
+    startDownloadProcess();
   };
 
-  const handlePaymentSuccess = () => {
+  const handlePaymentSuccess = async () => {
       if (currentUser) {
+          const newCredit = (currentUser.credit || 0) + TICKET_COST;
           const updatedUser = { 
               ...currentUser, 
-              credit: currentUser.credit + TICKET_COST 
+              credit: newCredit 
           };
           setCurrentUser(updatedUser);
           setShowPaymentModal(false);
+
+          try {
+            await UserService.updateUser(currentUser.id, { credit: newCredit });
+            const me = await AuthService.getCurrentUser();
+            if (me) {
+              setCurrentUser(normalizeUser(me));
+              localStorage.setItem('user', JSON.stringify(me));
+            }
+          } catch (err) {
+            console.warn('Failed to update credit on server:', err);
+          }
           
           setTimeout(() => {
               handleDownloadRequest();
@@ -2102,32 +2673,42 @@ export default function App() {
           return;
       }
 
+      const styleSheets = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+          .map((el) => el.outerHTML)
+          .join('\n');
+
       printWindow.document.write(`
         <!doctype html>
-        <html>
+        <html dir="ltr">
           <head>
             <meta charset="utf-8" />
             <title>${fileName}</title>
+            ${styleSheets}
             <style>
-              body { margin: 0; background: #f3f4f6; display: flex; justify-content: center; padding: 24px; }
-              img { max-width: 100%; height: auto; display: block; }
+              body { margin: 0; background: #ffffff; display: flex; justify-content: center; padding: 24px; }
+              @media print {
+                body { padding: 0; background: #ffffff; }
+                @page { size: A4 portrait; margin: 0; }
+              }
             </style>
           </head>
-          <body>${element.outerHTML}</body>
+          <body>
+            ${element.outerHTML}
+            <script>
+              window.onload = () => {
+                setTimeout(() => {
+                  window.focus();
+                  window.print();
+                }, 300);
+              };
+            </script>
+          </body>
         </html>
       `);
       printWindow.document.close();
-      printWindow.focus();
-      printWindow.print();
   };
 
   const generatePdfFromRef = async (element: HTMLElement, fileName: string) => {
-      if (!window.jspdf) {
-          console.error('PDF library is not loaded. jsPDF is missing.');
-          alert('PDF generator is not ready yet. Please refresh the page and try again.');
-          return;
-      }
-
       const hasUnsupportedColorFunction = (value: string) =>
           value.includes('oklch(') || value.includes('oklab(') || value.includes('color-mix(');
 
@@ -2162,7 +2743,7 @@ export default function App() {
               .split(/\s+/)
               .map((part) => part.endsWith('%') ? Number(part.slice(0, -1)) / 100 : Number(part));
 
-      const normalizeModernCssColors = (value: string) => {
+      const normalizeModernCssColors = (value: string): string => {
           if (!hasUnsupportedColorFunction(value)) return value;
 
           return value
@@ -2177,141 +2758,26 @@ export default function App() {
               });
       };
 
-      const inlineComputedStyles = (sourceRoot: HTMLElement, clonedRoot: HTMLElement) => {
-          const sourceNodes = [sourceRoot, ...Array.from(sourceRoot.querySelectorAll<HTMLElement>('*'))];
-          const clonedNodes = [clonedRoot, ...Array.from(clonedRoot.querySelectorAll<HTMLElement>('*'))];
-          const svgRootProperties = new Set([
-              'color',
-              'display',
-              'flex',
-              'flex-basis',
-              'flex-grow',
-              'flex-shrink',
-              'height',
-              'margin',
-              'margin-bottom',
-              'margin-left',
-              'margin-right',
-              'margin-top',
-              'opacity',
-              'rotate',
-              'transform',
-              'transform-origin',
-              'translate',
-              'width'
-          ]);
-          const svgChildProperties = new Set(['color', 'fill', 'opacity', 'stroke', 'stroke-width']);
+      const colorHelperCanvas = document.createElement('canvas');
+      colorHelperCanvas.width = 1;
+      colorHelperCanvas.height = 1;
+      const colorCtx = colorHelperCanvas.getContext('2d');
 
-          sourceNodes.forEach((sourceNode, index) => {
-              const clonedNode = clonedNodes[index];
-              if (!clonedNode) return;
-
-              const computed = window.getComputedStyle(sourceNode);
-              const isSvgElement = sourceNode instanceof SVGElement;
-              const isSvgRoot = isSvgElement && sourceNode.tagName.toLowerCase() === 'svg';
-              const allowedSvgProperties = isSvgRoot ? svgRootProperties : svgChildProperties;
-              for (const propertyName of Array.from(computed)) {
-                  if (propertyName.startsWith('--')) continue;
-                  if (isSvgElement && !allowedSvgProperties.has(propertyName)) continue;
-                  let propertyValue = computed.getPropertyValue(propertyName);
-                  if (!propertyValue) continue;
-
-                  propertyValue = normalizeModernCssColors(propertyValue);
-                  if (!propertyValue || hasUnsupportedColorFunction(propertyValue)) {
-                      if (propertyName === 'background-image') {
-                          clonedNode.style.setProperty(propertyName, 'none');
-                      } else {
-                          clonedNode.style.removeProperty(propertyName);
-                      }
-                      continue;
+      const toRgbColor = (rawColor: string): string => {
+          if (!rawColor || !rawColor.trim()) return rawColor;
+          if (!hasUnsupportedColorFunction(rawColor)) return rawColor;
+          if (colorCtx) {
+              try {
+                  colorCtx.fillStyle = '#000000';
+                  colorCtx.fillStyle = rawColor;
+                  if (colorCtx.fillStyle && colorCtx.fillStyle !== '#000000' && !hasUnsupportedColorFunction(colorCtx.fillStyle)) {
+                      return colorCtx.fillStyle;
                   }
-
-                  clonedNode.style.setProperty(propertyName, propertyValue, computed.getPropertyPriority(propertyName));
+              } catch {
+                  // Fallback
               }
-
-              clonedNode.removeAttribute('class');
-          });
-      };
-
-      const stabilizeSvgIcons = (root: HTMLElement) => {
-          root.querySelectorAll<SVGElement>('svg').forEach((svg) => {
-              const width = svg.style.width || svg.getAttribute('width') || '1em';
-              const height = svg.style.height || svg.getAttribute('height') || '1em';
-              svg.style.setProperty('display', 'block');
-              svg.style.setProperty('flex-shrink', '0');
-              svg.style.setProperty('overflow', 'visible');
-              svg.setAttribute('width', width);
-              svg.setAttribute('height', height);
-          });
-      };
-
-      const normalizeTransformsForCanvas = (sourceRoot: HTMLElement, clonedRoot: HTMLElement) => {
-          const sourceNodes = [sourceRoot, ...Array.from(sourceRoot.querySelectorAll<HTMLElement>('*'))];
-          const clonedNodes = [clonedRoot, ...Array.from(clonedRoot.querySelectorAll<HTMLElement>('*'))];
-          const splitTransformValue = (value: string) => value.trim().split(/\s+/).filter(Boolean);
-          const formatTranslate = (value: string) => {
-              const [x = '0px', y = '0px'] = splitTransformValue(value);
-              return `translate(${x}, ${y})`;
-          };
-          const formatScale = (value: string) => {
-              const [x = '1', y] = splitTransformValue(value);
-              return y ? `scale(${x}, ${y})` : `scale(${x})`;
-          };
-
-          sourceNodes.forEach((sourceNode, index) => {
-              const clonedNode = clonedNodes[index];
-              if (!clonedNode) return;
-
-              const computed = window.getComputedStyle(sourceNode);
-              const transform = computed.getPropertyValue('transform');
-              const translate = computed.getPropertyValue('translate');
-              const rotate = computed.getPropertyValue('rotate');
-              const scale = computed.getPropertyValue('scale');
-              const transformParts: string[] = [];
-
-              if (translate && translate !== 'none') {
-                  transformParts.push(formatTranslate(translate));
-              }
-
-              if (rotate && rotate !== 'none') {
-                  transformParts.push(`rotate(${rotate})`);
-              }
-
-              if (scale && scale !== 'none') {
-                  transformParts.push(formatScale(scale));
-              }
-
-              if (transform && transform !== 'none') {
-                  transformParts.push(transform);
-              }
-
-              if (transformParts.length > 0) {
-                  clonedNode.style.setProperty('transform', transformParts.join(' '));
-                  clonedNode.style.removeProperty('translate');
-                  clonedNode.style.removeProperty('rotate');
-                  clonedNode.style.removeProperty('scale');
-              }
-          });
-      };
-
-      const removeUnsupportedInlineStyles = (root: HTMLElement) => {
-          const nodes = [root, ...Array.from(root.querySelectorAll<HTMLElement>('*'))];
-
-          nodes.forEach((node) => {
-              for (const propertyName of Array.from(node.style)) {
-                  const propertyValue = node.style.getPropertyValue(propertyName);
-                  if (!propertyValue) continue;
-
-                  const normalizedValue = normalizeModernCssColors(propertyValue);
-                  if (normalizedValue && !hasUnsupportedColorFunction(normalizedValue)) {
-                      node.style.setProperty(propertyName, normalizedValue, node.style.getPropertyPriority(propertyName));
-                  } else if (propertyName === 'background-image') {
-                      node.style.setProperty(propertyName, 'none');
-                  } else {
-                      node.style.removeProperty(propertyName);
-                  }
-              }
-          });
+          }
+          return normalizeModernCssColors(rawColor);
       };
 
       const blobToDataUrl = (blob: Blob) => new Promise<string>((resolve, reject) => {
@@ -2321,8 +2787,8 @@ export default function App() {
           reader.readAsDataURL(blob);
       });
 
-      const safeInlineTicketImages = async (clonedRoot: HTMLElement) => {
-          const images = Array.from(clonedRoot.querySelectorAll<HTMLImageElement>('img'));
+      const safeInlineTicketImages = async (rootNode: HTMLElement) => {
+          const images = Array.from(rootNode.querySelectorAll<HTMLImageElement>('img'));
           const pdfAssetProxyUrl = (assetUrl: string) => {
               const apiBaseUrl = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
               const proxyUrl = new URL(`${apiBaseUrl}/assets/proxy`, window.location.origin);
@@ -2331,17 +2797,27 @@ export default function App() {
           };
 
           const fetchImageBlob = async (url: string) => {
-              const response = await fetch(url, { mode: 'cors', credentials: 'same-origin' });
-              if (!response.ok) {
-                  throw new Error(`Image request failed with status ${response.status}`);
+              const controller = new AbortController();
+              const timer = setTimeout(() => controller.abort(), 5000);
+              try {
+                  const response = await fetch(url, { 
+                      mode: 'cors', 
+                      credentials: 'same-origin',
+                      signal: controller.signal 
+                  });
+                  clearTimeout(timer);
+                  if (!response.ok) {
+                      throw new Error(`Image request failed with status ${response.status}`);
+                  }
+                  const contentType = response.headers.get('content-type') || '';
+                  if (!contentType.startsWith('image/')) {
+                      throw new Error('Image request did not return an image');
+                  }
+                  return await response.blob();
+              } catch (err) {
+                  clearTimeout(timer);
+                  throw err;
               }
-
-              const contentType = response.headers.get('content-type') || '';
-              if (!contentType.startsWith('image/')) {
-                  throw new Error('Image request did not return an image');
-              }
-
-              return response.blob();
           };
 
           await Promise.all(images.map(async (image) => {
@@ -2351,25 +2827,20 @@ export default function App() {
               try {
                   const absoluteUrl = new URL(src, window.location.href).toString();
                   let imageBlob: Blob;
-
                   try {
                       imageBlob = await fetchImageBlob(absoluteUrl);
                   } catch (directFetchError) {
                       imageBlob = await fetchImageBlob(pdfAssetProxyUrl(absoluteUrl));
                   }
-
                   image.setAttribute('src', await blobToDataUrl(imageBlob));
               } catch (error) {
                   console.warn('Skipping image that cannot be safely embedded in PDF:', src, error);
-                  image.removeAttribute('src');
-                  image.style.visibility = 'hidden';
               }
           }));
       };
 
-      const waitForTicketImages = async (root: HTMLElement) => {
-          const images = Array.from(root.querySelectorAll<HTMLImageElement>('img'));
-
+      const waitForTicketImages = async (rootNode: HTMLElement) => {
+          const images = Array.from(rootNode.querySelectorAll<HTMLImageElement>('img'));
           await Promise.all(images.map(async (image) => {
               if (!image.getAttribute('src')) return;
               try {
@@ -2382,92 +2853,124 @@ export default function App() {
                       });
                   }
               } catch {
-                  // A failed optional logo should not block the PDF.
+                  // Non-blocking for PDF generation
               }
           }));
       };
 
-      const clone = element.cloneNode(true) as HTMLElement;
-      clone.style.transform = 'none';
-      clone.style.margin = '0';
-      clone.dir = 'ltr'; // Force LTR for PDF generation
-
-      const iframe = document.createElement('iframe');
-      iframe.setAttribute('aria-hidden', 'true');
-      iframe.style.position = 'absolute';
-      iframe.style.top = '-9999px';
-      iframe.style.left = '-9999px';
-      iframe.style.width = '794px';
-      iframe.style.height = `${element.scrollHeight || 1123}px`;
-      iframe.style.border = '0';
-      document.body.appendChild(iframe);
-
-      const iframeDocument = iframe.contentDocument;
-      if (!iframeDocument) {
-          document.body.removeChild(iframe);
-          throw new Error('Failed to initialize isolated PDF document');
-      }
-
-      iframeDocument.open();
-      iframeDocument.write(`
-        <!doctype html>
-        <html dir="ltr">
-          <head>
-            <meta charset="utf-8" />
-            <style>
-              html, body { margin: 0; padding: 0; background: #ffffff; }
-              body { width: 794px; color: rgb(17, 24, 39); }
-              * {
-                box-sizing: border-box;
-                color-scheme: light;
-                border-color: rgb(229, 231, 235);
-              }
-            </style>
-          </head>
-          <body></body>
-        </html>
-      `);
-      iframeDocument.close();
-
-      iframeDocument.body.appendChild(clone);
-
       try {
-          inlineComputedStyles(element, clone);
-          stabilizeSvgIcons(clone);
-          normalizeTransformsForCanvas(element, clone);
-          removeUnsupportedInlineStyles(clone);
-          await safeInlineTicketImages(clone);
-          await waitForTicketImages(clone);
-          await iframe.contentWindow?.document.fonts?.ready;
+          // Pre-inline and preload images and fonts in the main document
+          await safeInlineTicketImages(element);
+          await waitForTicketImages(element);
+          await document.fonts?.ready;
 
-          const width = Math.ceil(clone.scrollWidth || 794);
-          const height = Math.ceil(clone.scrollHeight || element.scrollHeight || 1123);
-          const canvas = await html2canvas(clone, {
+          const exportWidth = 794;
+          const exportHeight = element.scrollHeight || 1123;
+
+          const canvas = await html2canvas(element, {
               backgroundColor: '#ffffff',
-              scale: 2,
+              scale: 2, // 2x for sharp 300 DPI print quality
               useCORS: true,
               allowTaint: false,
               logging: false,
-              width,
-              height,
-              windowWidth: width,
-              windowHeight: height,
+              width: exportWidth,
+              height: exportHeight,
+              windowWidth: exportWidth,
+              windowHeight: exportHeight,
               scrollX: 0,
-              scrollY: 0
+              scrollY: 0,
+              onclone: (clonedDoc, clonedTarget) => {
+                  // Ensure cloned element is visible and positioned at origin in snapshot document
+                  clonedTarget.style.position = 'static';
+                  clonedTarget.style.left = '0';
+                  clonedTarget.style.top = '0';
+                  clonedTarget.style.margin = '0 auto';
+                  clonedTarget.style.transform = 'none';
+                  clonedTarget.style.visibility = 'visible';
+                  clonedTarget.style.display = 'block';
+
+                  if (clonedTarget.parentElement) {
+                      clonedTarget.parentElement.style.position = 'static';
+                      clonedTarget.parentElement.style.left = '0';
+                      clonedTarget.parentElement.style.top = '0';
+                      clonedTarget.parentElement.style.visibility = 'visible';
+                      clonedTarget.parentElement.style.display = 'block';
+                      clonedTarget.parentElement.style.transform = 'none';
+                  }
+
+                  // 1. Sanitize all <style> blocks in cloned document so html2canvas's CSS parser
+                  //    never chokes on Tailwind v4's modern oklch/oklab color declarations
+                  clonedDoc.querySelectorAll('style').forEach((styleEl) => {
+                      if (styleEl.textContent && hasUnsupportedColorFunction(styleEl.textContent)) {
+                          styleEl.textContent = styleEl.textContent.replace(/(?:oklch|oklab|color-mix)\([^)]+\)/g, (match) => toRgbColor(match));
+                      }
+                  });
+
+                  // 2. Convert any inline modern colors on cloned target elements to standard RGB
+                  const allNodes = [clonedTarget, ...Array.from(clonedTarget.querySelectorAll<HTMLElement>('*'))];
+                  allNodes.forEach((node) => {
+                      if (node.style.backgroundImage && hasUnsupportedColorFunction(node.style.backgroundImage)) {
+                          node.style.backgroundImage = node.style.backgroundImage.replace(/(?:oklch|oklab|color-mix)\([^)]+\)/g, (match) => toRgbColor(match));
+                      }
+                      if (node.style.color && hasUnsupportedColorFunction(node.style.color)) {
+                          node.style.color = toRgbColor(node.style.color);
+                      }
+                      if (node.style.backgroundColor && hasUnsupportedColorFunction(node.style.backgroundColor)) {
+                          node.style.backgroundColor = toRgbColor(node.style.backgroundColor);
+                      }
+                      if (node.style.borderColor && hasUnsupportedColorFunction(node.style.borderColor)) {
+                          node.style.borderColor = toRgbColor(node.style.borderColor);
+                      }
+                  });
+
+                  // 3. Stabilize SVG icons (ensure width/height are set explicitly so Lucide icons never collapse)
+                  clonedTarget.querySelectorAll<SVGElement>('svg').forEach((svg) => {
+                      const width = svg.style.width || svg.getAttribute('width') || '1.25em';
+                      const height = svg.style.height || svg.getAttribute('height') || '1.25em';
+                      svg.style.setProperty('display', 'inline-block');
+                      svg.style.setProperty('vertical-align', 'middle');
+                      svg.style.setProperty('overflow', 'visible');
+                      svg.setAttribute('width', width);
+                      svg.setAttribute('height', height);
+                  });
+              }
           });
 
-          const imgData = canvas.toDataURL('image/jpeg', 1.0);
-          const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = pdf.internal.pageSize.getHeight();
+          const imgData = canvas.toDataURL('image/jpeg', 0.98);
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth(); // 210 mm
+          const pdfHeight = pdf.internal.pageSize.getHeight(); // 297 mm
 
-          pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+          // Preserve exact proportional aspect ratio
+          const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+          if (imgHeight <= pdfHeight) {
+              // Fits within single A4 page
+              pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, imgHeight);
+          } else if (imgHeight <= pdfHeight * 1.25) {
+              // Slightly longer: fit proportionally to clean single A4 page without distortion
+              const scaleRatio = pdfHeight / imgHeight;
+              const scaledWidth = pdfWidth * scaleRatio;
+              const xOffset = (pdfWidth - scaledWidth) / 2;
+              pdf.addImage(imgData, 'JPEG', xOffset, 0, scaledWidth, pdfHeight);
+          } else {
+              // Multi-page A4
+              let heightLeft = imgHeight;
+              let position = 0;
+              pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight);
+              heightLeft -= pdfHeight;
+              while (heightLeft > 0) {
+                  position = heightLeft - imgHeight;
+                  pdf.addPage();
+                  pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight);
+                  heightLeft -= pdfHeight;
+              }
+          }
+
           pdf.save(`${fileName}.pdf`);
       } catch (err) {
-          console.error(err);
-          alert("Error generating PDF");
-      } finally {
-          document.body.removeChild(iframe);
+          console.error('Error generating PDF:', err);
+          alert('Error generating PDF. Please try again.');
       }
   };
 
@@ -2560,8 +3063,103 @@ export default function App() {
   const downloadPDF = async () => {
     setIsGenerating(true);
     try {
-      if (view === 'generator' && ticketRef.current) {
-        await generatePdfFromRef(ticketRef.current, `Ticket-${passenger.lastName}`);
+      const flights = tripType === TripType.ROUND_TRIP ? [flight1, flight2] : [flight1];
+      const targetElement = pdfExportRef.current || ticketRef.current;
+      if (view === 'generator' && targetElement) {
+        await generatePdfFromRef(targetElement, `Ticket-${passenger.lastName || 'Passenger'}`);
+
+        // 1. Prepare history item for Ticket Management (مدیریت بلیت‌ها)
+        const ticketId = passenger.ticketId || `SKY${Math.floor(10000000 + Math.random() * 90000000)}`;
+        const pnr = passenger.pnr || `PNR${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+        const passengerName = `${passenger.firstName || ''} ${passenger.lastName || ''}`.trim() || 'Passenger';
+        const route = `${flights[0]?.originCode || 'MHD'} - ${flights[0]?.destCode || 'THR'}`;
+        const date = flights[0]?.isoDate || flights[0]?.date || new Date().toISOString().split('T')[0];
+        const calculatedPrice = (() => {
+          if (passenger.price && passenger.price.trim() !== '') return passenger.price;
+          const airline = flights[0]?.airline || '';
+          const cleanAirline = airline.toUpperCase();
+          const matched = ticketPricingConfig.customAirlinePrices?.find(
+            (a) => a.isActive && (cleanAirline.includes(a.airlineCode) || cleanAirline.includes(a.airlineName.toUpperCase()))
+          );
+          const isDomestic = (flights[0]?.originCode === 'THR' || flights[0]?.originCode === 'MHD' || flights[0]?.originCode === 'SYZ' || flights[0]?.originCode === 'IFN' || flights[0]?.originCode === 'TBZ' || flights[0]?.originCode === 'KIH') &&
+                             (flights[0]?.destCode === 'THR' || flights[0]?.destCode === 'MHD' || flights[0]?.destCode === 'SYZ' || flights[0]?.destCode === 'IFN' || flights[0]?.destCode === 'TBZ' || flights[0]?.destCode === 'KIH');
+
+          if (ticketPricingConfig.defaultCurrency === 'USD') {
+            if (matched) return `$${matched.priceUsd}`;
+            return isDomestic ? `$${ticketPricingConfig.domesticPriceUsd}` : `$${ticketPricingConfig.internationalPriceUsd}`;
+          } else {
+            if (matched) return `${matched.priceIrr.toLocaleString()} ریال`;
+            return isDomestic ? `${ticketPricingConfig.domesticPriceIrr.toLocaleString()} ریال` : `${ticketPricingConfig.internationalPriceIrr.toLocaleString()} ریال`;
+          }
+        })();
+
+        const price = calculatedPrice;
+        const paymentMethod = currentUser 
+          ? (currentUser.isUnlimited ? 'Unlimited' : (currentUser.bonusFreeTickets || 0) > 0 ? 'Free Bonus' : 'Wallet') 
+          : 'صادر شده / آنلاین';
+
+        const historyRecord: TicketHistoryItem = {
+          id: `hist_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+          ticketId,
+          pnr,
+          passengerName,
+          route,
+          date,
+          issuedBy: currentUser?.name || 'مدیر سیستم / صدور آنلاین',
+          status: 'Confirmed',
+          price,
+          paymentMethod,
+          notes: `${flights[0]?.flightNumber || ''} ${flights[0]?.airline || ''}`
+        };
+
+        // Always save ticket to history and localStorage immediately
+        setTicketHistory((prev) => {
+          const updated = [historyRecord, ...prev.filter((t) => t.ticketId !== ticketId)];
+          try {
+            localStorage.setItem('localTicketHistory', JSON.stringify(updated.slice(0, 100)));
+          } catch (e) {}
+          return updated;
+        });
+
+        // 2. Automatically save passenger by passport/national ID to savedPassengers
+        saveOrUpdatePassengerFromCurrent(passenger);
+
+        // 3. If authenticated, persist to backend
+        if (currentUser) {
+          try {
+            const created = await TicketService.createTicket({
+              ticketId,
+              pnr,
+              passengerName,
+              route,
+              date,
+              price,
+              currency: ticketPricingConfig.defaultCurrency,
+              paymentMethod,
+              status: 'CONFIRMED',
+              notes: `${flights[0]?.flightNumber || ''} ${flights[0]?.airline || ''}`
+            });
+
+            if (created) {
+              const normalized = normalizeTicket(created);
+              setTicketHistory((prev) => {
+                const updated = [normalized, ...prev.filter((t) => t.ticketId !== normalized.ticketId)];
+                try {
+                  localStorage.setItem('localTicketHistory', JSON.stringify(updated.slice(0, 100)));
+                } catch (e) {}
+                return updated;
+              });
+            }
+
+            const me = await AuthService.getCurrentUser();
+            if (me) {
+              setCurrentUser(normalizeUser(me));
+              localStorage.setItem('user', JSON.stringify(me));
+            }
+          } catch (createErr) {
+            console.warn('Could not record issued ticket in backend, saved locally:', createErr);
+          }
+        }
       }
     } finally {
       setIsGenerating(false);
@@ -2641,6 +3239,21 @@ export default function App() {
            </div>
 
            <div className="flex items-center gap-3">
+              {/* Ticket Management button accessible to view saved/downloaded tickets & base data */}
+              <button 
+                  onClick={() => setView(view === 'dashboard' ? 'generator' : 'dashboard')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs md:text-sm font-bold transition-all shadow-xs ${view === 'dashboard' ? 'bg-blue-600 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}
+                  title={isRTL ? 'مدیریت بلیت‌ها و داده‌های پایه' : 'Ticket Management'}
+              >
+                  <LayoutDashboard className="w-4 h-4 text-blue-500" />
+                  <span>{isRTL ? 'مدیریت بلیت‌ها' : 'Ticket Management'}</span>
+                  {ticketHistory.length > 0 && (
+                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${view === 'dashboard' ? 'bg-white text-blue-600' : 'bg-blue-100 text-blue-700'}`}>
+                      {ticketHistory.length}
+                    </span>
+                  )}
+              </button>
+
               {/* Blog Link in Header */}
               <button onClick={() => setView('blog')} className="hidden md:flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                   <BookOpen className="w-4 h-4" /> Blog
@@ -2649,23 +3262,23 @@ export default function App() {
               {currentUser ? (
                   <>
                      <div className="hidden md:flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-                         <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
+                         <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold shrink-0">
                              {currentUser.name.charAt(0)}
                          </div>
                          <div className="flex flex-col text-right">
                              <span className="text-xs font-bold text-gray-700">{currentUser.name}</span>
-                             <span className="text-[10px] text-gray-500">${currentUser.credit}</span>
+                             <div className="flex items-center gap-1 text-[10px] font-semibold">
+                                 <span className="text-blue-700">{(currentUser.creditIrr ?? currentUser.credit ?? 0).toLocaleString()} ریال</span>
+                                 <span className="text-gray-300">/</span>
+                                 <span className="text-emerald-700">${currentUser.creditUsd ?? 0}</span>
+                             </div>
+                             {((currentUser.giftCreditIrr ?? currentUser.giftCredit ?? 0) > 0 || (currentUser.giftCreditUsd ?? 0) > 0) && (
+                                 <span className="text-[9px] font-bold text-amber-700 bg-amber-50 rounded px-1 border border-amber-200/60">
+                                     هدیه: {(currentUser.giftCreditIrr ?? currentUser.giftCredit ?? 0).toLocaleString()} ریال (${currentUser.giftCreditUsd ?? 0})
+                                 </span>
+                             )}
                          </div>
                      </div>
-                     {currentUser.role !== 'User' && (
-                         <button 
-                             onClick={() => setView(view === 'dashboard' ? 'generator' : 'dashboard')}
-                             className={`p-2 rounded-lg transition-colors ${view === 'dashboard' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-                             title="Toggle Dashboard"
-                         >
-                             <LayoutDashboard className="w-5 h-5" />
-                         </button>
-                     )}
                      <button onClick={handleLogout} className="p-2 text-red-500 hover:bg-red-50 rounded-lg" title={t('logout')}>
                          <LogOut className="w-5 h-5" />
                      </button>
@@ -2689,9 +3302,21 @@ export default function App() {
       
       {/* Main Content */}
       <main className="min-h-[calc(100vh-64px)]">
-        {view === 'dashboard' && currentUser ? (
+        {view === 'dashboard' ? (
             <Dashboard 
-                currentUser={currentUser}
+                currentUser={currentUser || {
+                  id: 'current-admin',
+                  name: isRTL ? 'مدیر سیستم' : 'System Admin',
+                  email: 'admin@skyticket.com',
+                  mobile: '09121234567',
+                  role: 'Admin',
+                  status: 'Active',
+                  credit: 10000,
+                  isUnlimited: true,
+                  bonusFreeTickets: 100,
+                  permissions: ['ISSUE_TICKET', 'MANAGE_USERS', 'MANAGE_BASE_DATA', 'VIEW_FINANCIALS', 'MANAGE_REVENUE', 'MANAGE_ADS', 'MANAGE_SETTINGS', 'MANAGE_BLOG']
+                }}
+                onBackToGenerator={() => setView('generator')}
                 users={users}
                 tickets={ticketHistory}
                 savedFlights={savedFlights} setSavedFlights={setSavedFlights}
@@ -2704,6 +3329,8 @@ export default function App() {
                 staticPages={staticPages} setStaticPages={setStaticPages}
                 blogPosts={blogPosts} setBlogPosts={setBlogPosts}
                 revenueConfig={revenueConfig} setRevenueConfig={setRevenueConfig}
+                ticketPricingConfig={ticketPricingConfig} setTicketPricingConfig={setTicketPricingConfig}
+                onSaveTicketPricing={handleSaveTicketPricing}
                 lang={lang} t={t}
                 onDownloadTicket={handleHistoryDownload}
                 onSaveUser={handleSaveUser}
@@ -2755,6 +3382,7 @@ export default function App() {
                         <div className="space-y-4">
                             <Input label={t('agencyName')} name="name" value={agency.name} onChange={handleAgencyChange} />
                             <Input label={t('phone')} name="phone" value={agency.phone} onChange={handleAgencyChange} />
+                            <Input label={lang === 'fa' ? 'آدرس آژانس' : 'Agency Address'} name="address" value={agency.address || ''} onChange={handleAgencyChange} placeholder={lang === 'fa' ? 'عراق نجف خیابان جنسیه مرکز لبنانی' : 'Agency Address'} />
                             
                             <div>
                                 <label className="text-xs font-medium text-gray-500 mb-1 block">{t('logo')}</label>
@@ -2800,13 +3428,22 @@ export default function App() {
                         </div>
                         <div className="grid grid-cols-2 gap-3 mt-3">
                             <div>
-                                <label className="text-xs font-medium text-gray-500 mb-1 block">{t('gender')}</label>
-                                <select name="gender" value={passenger.gender} onChange={handlePassengerChange} className="w-full p-2 rounded-lg border border-gray-300 bg-gray-50 text-sm focus:bg-white outline-none">
+                                <label className="text-xs font-semibold text-gray-700 mb-1.5 block">{t('gender')}</label>
+                                <select name="gender" value={passenger.gender} onChange={handlePassengerChange} className="w-full p-2.5 rounded-lg border-2 border-slate-400 hover:border-slate-500 bg-white text-sm text-gray-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition-all shadow-sm">
                                     <option value="Male">{t('male')}</option>
                                     <option value="Female">{t('female')}</option>
                                 </select>
                             </div>
-                            <Input label={t('nationality')} name="nationality" value={passenger.nationality} onChange={handlePassengerChange} />
+                            <SearchableCombobox 
+                              label={t('nationality')} 
+                              name="nationality" 
+                              value={passenger.nationality} 
+                              uppercase
+                              onChange={(val) => setPassenger(prev => ({ ...prev, nationality: val }))} 
+                              options={nationalityOptions}
+                              placeholder="IRAQ, IRAN..."
+                              isRTL={isRTL}
+                            />
                         </div>
                         <div className="grid grid-cols-2 gap-3 mt-3">
                              <div>
@@ -2832,19 +3469,90 @@ export default function App() {
                                          <span className="text-xs font-medium text-gray-700">{t('nationalId')}</span>
                                      </label>
                                  </div>
-                                 <Input 
-                                    label={passenger.idType === 'NationalID' ? t('nationalId') : t('passport')} 
-                                    name="passportNumber" 
-                                    value={passenger.passportNumber} 
-                                    onChange={handlePassengerChange} 
-                                 />
+                                 <div className="relative">
+                                   <Input 
+                                      label={passenger.idType === 'NationalID' ? t('nationalId') : t('passport')} 
+                                      name="passportNumber" 
+                                      value={passenger.passportNumber} 
+                                      onChange={handlePassengerChange} 
+                                   />
+                                   {autoFillNotice && (
+                                     <div className="mt-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 animate-in fade-in duration-200 shadow-xs">
+                                       <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
+                                       <span className="font-semibold">{autoFillNotice}</span>
+                                     </div>
+                                   )}
+                                   {idSearchSuggestions.length > 0 && (
+                                     <div className="absolute z-30 left-0 right-0 top-full mt-1 bg-white border border-blue-200 rounded-xl shadow-2xl overflow-hidden divide-y divide-slate-100 max-h-48 overflow-y-auto">
+                                       <div className="bg-blue-50/80 px-3 py-1.5 text-[11px] font-bold text-blue-700 flex justify-between items-center">
+                                         <span>{isRTL ? 'مسافران منطبق با شناسه:' : 'Matching Saved Passengers:'}</span>
+                                         <button type="button" onClick={() => setIdSearchSuggestions([])} className="text-gray-400 hover:text-gray-600">✕</button>
+                                       </div>
+                                       {idSearchSuggestions.map((sp) => (
+                                         <button
+                                           key={sp.id}
+                                           type="button"
+                                           onClick={() => applyPassengerSuggestion(sp)}
+                                           className="w-full text-start px-3 py-2 text-xs hover:bg-blue-50 transition flex justify-between items-center"
+                                         >
+                                           <span className="font-bold text-gray-800">{sp.firstName} {sp.lastName}</span>
+                                           <span className="font-mono text-[11px] bg-slate-100 px-2 py-0.5 rounded text-blue-600 font-bold">{sp.passportNumber || sp.nationalId}</span>
+                                         </button>
+                                       ))}
+                                     </div>
+                                   )}
+                                 </div>
                              </div>
                              <Input label={t('ticketId')} name="ticketId" value={passenger.ticketId} onChange={handlePassengerChange} className="mt-8" />
                         </div>
                         <div className="grid grid-cols-2 gap-3 mt-3">
                              <Input label={t('pnr')} name="pnr" value={passenger.pnr} onChange={handlePassengerChange} />
-                             {(selectedTemplate === '7' || selectedTemplate === '8') && <Input label={t('localPnr')} name="localPnr" value={passenger.localPnr || ''} onChange={handlePassengerChange} />}
+                             {(selectedTemplate === '7' || selectedTemplate === '8' || selectedTemplate === '9') && (
+                               <Input 
+                                 label={selectedTemplate === '9' ? (isRTL ? 'شماره سفارش (Order No)' : 'Order Number') : t('localPnr')} 
+                                 name="localPnr" 
+                                 value={passenger.localPnr || ''} 
+                                 onChange={handlePassengerChange} 
+                                 placeholder={selectedTemplate === '9' ? '1088398569' : undefined} 
+                               />
+                             )}
                         </div>
+
+                        {/* Issue Date & Issue Time */}
+                        <div className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                          <div className="flex justify-between items-center px-0.5">
+                            <span className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                              <Clock className="w-3.5 h-3.5 text-blue-600" />
+                              {isRTL ? 'زمان و تاریخ صدور بلیت (Issue Details)' : 'Issue Date & Time'}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={handleSetIssueToNow}
+                              className="text-[11px] text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 hover:underline cursor-pointer bg-blue-50/80 px-2 py-0.5 rounded border border-blue-200"
+                              title={isRTL ? 'تنظیم به ساعت و تاریخ فعلی' : 'Set to current date and time'}
+                            >
+                              <Sparkles className="w-3 h-3 text-blue-600" />
+                              <span>{isRTL ? 'تنظیم به اکنون' : 'Set to Now'}</span>
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <Input 
+                              label={t('issueDate')} 
+                              name="issueDate" 
+                              value={passenger.issueDate || ''} 
+                              onChange={handlePassengerChange} 
+                              placeholder="07/Nov/2025" 
+                            />
+                            <Input 
+                              label={t('issueTime')} 
+                              name="issueTime" 
+                              value={passenger.issueTime || ''} 
+                              onChange={handlePassengerChange} 
+                              placeholder="18:11" 
+                            />
+                          </div>
+                        </div>
+
                         <div className="mt-3 relative">
                             <Input label={t('price')} name="price" value={passenger.price || ''} onChange={handlePassengerChange} />
                             <button onClick={() => setShowPrice(!showPrice)} className={`absolute ${isRTL ? 'left-2' : 'right-2'} top-8 text-gray-400 hover:text-blue-600`}>
@@ -2867,11 +3575,33 @@ export default function App() {
                     />}
 
                     {/* Flight Forms */}
-                    <FlightForm title={t('goFlight')} data={flight1} onChange={(e: any) => handleFlightChange(1, e)} onDateChange={(e: any) => handleFlightDateChange(1, e)} isSepehr={selectedTemplate === '7' || selectedTemplate === '8'} t={t} isRTL={isRTL} airports={savedAirports} />
+                    <FlightForm 
+                      title={t('goFlight')} 
+                      data={flight1} 
+                      onChange={(e: any) => handleFlightChange(1, e)} 
+                      onFieldChange={(name: string, val: string, extra?: any) => handleFlightFieldChange(1, name, val, extra)}
+                      onDateChange={(e: any) => handleFlightDateChange(1, e)} 
+                      isSepehr={selectedTemplate === '7' || selectedTemplate === '8' || selectedTemplate === '9'} 
+                      t={t} 
+                      isRTL={isRTL} 
+                      airports={savedAirports} 
+                      airlines={savedAirlines}
+                    />
                     
                     {tripType === TripType.ROUND_TRIP && (
                         <div className="animate-in fade-in slide-in-from-top-4 duration-300">
-                             <FlightForm title={t('returnFlight')} data={flight2} onChange={(e: any) => handleFlightChange(2, e)} onDateChange={(e: any) => handleFlightDateChange(2, e)} isSepehr={selectedTemplate === '7' || selectedTemplate === '8'} t={t} isRTL={isRTL} airports={savedAirports} />
+                             <FlightForm 
+                               title={t('returnFlight')} 
+                               data={flight2} 
+                               onChange={(e: any) => handleFlightChange(2, e)} 
+                               onFieldChange={(name: string, val: string, extra?: any) => handleFlightFieldChange(2, name, val, extra)}
+                               onDateChange={(e: any) => handleFlightDateChange(2, e)} 
+                               isSepehr={selectedTemplate === '7' || selectedTemplate === '8' || selectedTemplate === '9'} 
+                               t={t} 
+                               isRTL={isRTL} 
+                               airports={savedAirports} 
+                               airlines={savedAirlines}
+                             />
                         </div>
                     )}
 
@@ -2907,34 +3637,13 @@ export default function App() {
                 {/* Preview Section */}
                 <div className="flex-1 flex flex-col min-w-0">
                     <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-wrap gap-4 justify-between items-center sticky top-20 z-20">
-                         <div className="flex items-center gap-2 text-sm font-bold text-gray-700">
-                             <Palette className="w-4 h-4 text-gray-400" /> {t('selectDesign')}
+                         <div className="flex items-center gap-2 text-sm font-bold text-gray-800">
+                             <Palette className="w-4 h-4 text-blue-600" /> {t('selectDesign')}: <span className="text-blue-600 font-black">System Sepehr (New)</span>
                          </div>
-                         <div className="flex gap-2">
-                             <div className="flex bg-gray-100 p-1 rounded-lg">
-                                 <button onClick={() => setTemplateCategory('horizontal')} className={`p-2 rounded-md transition-all ${templateCategory === 'horizontal' ? 'bg-white shadow text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}><Grid className="w-4 h-4"/></button>
-                                 <button onClick={() => setTemplateCategory('vertical')} className={`p-2 rounded-md transition-all ${templateCategory === 'vertical' ? 'bg-white shadow text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}><AlignVerticalJustifyCenter className="w-4 h-4"/></button>
-                             </div>
+                         <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-bold border border-blue-200 shadow-2xs">
+                             <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                             <span>{isRTL ? 'قالب فعال: سیستم سپهر جدید' : 'Active: System Sepehr (New)'}</span>
                          </div>
-                    </div>
-
-                    {/* Template Gallery */}
-                    <div className="flex gap-4 overflow-x-auto pb-4 mb-4 snap-x">
-                        {templates.filter(tpl => (templateCategory === 'horizontal' ? ['1','2','3','4','7', '8'].includes(tpl.id) : ['5','6'].includes(tpl.id))).map(tpl => (
-                            <button 
-                                key={tpl.id}
-                                onClick={() => setSelectedTemplate(tpl.id)}
-                                className={`flex-shrink-0 w-32 md:w-40 snap-start p-3 rounded-xl border-2 transition-all text-left group ${selectedTemplate === tpl.id ? 'border-blue-600 bg-blue-50 ring-2 ring-blue-200 ring-offset-2' : 'border-gray-200 bg-white hover:border-gray-300'}`}
-                            >
-                                <div className={`h-20 rounded-lg ${tpl.thumbnailColor} mb-3 shadow-inner relative overflow-hidden`}>
-                                     {/* Mini Visual of Layout */}
-                                     <div className="absolute top-2 left-2 right-2 h-2 bg-white/20 rounded-sm"></div>
-                                     <div className="absolute top-5 left-2 w-8 h-8 bg-white/20 rounded-full"></div>
-                                     {!tpl.isActive && <div className="absolute inset-0 bg-black/40 flex items-center justify-center"><Lock className="w-4 h-4 text-white"/></div>}
-                                </div>
-                                <h3 className={`font-bold text-xs mb-1 ${selectedTemplate === tpl.id ? 'text-blue-700' : 'text-gray-700'}`}>{tpl.name}</h3>
-                            </button>
-                        ))}
                     </div>
 
                     {/* Live Preview Container */}
@@ -3003,9 +3712,59 @@ export default function App() {
       {/* Download Loader Modal */}
       {showDownloadLoader && <DownloadLoadingModal isRTL={isRTL} t={t} ad={getAd('spot_popup')} timer={downloadTimer} />}
 
+      {/* High-Fidelity PDF Export Portal - Full Resolution (794px), No Scale Transform */}
+      <div 
+        id="ticket-pdf-export-portal"
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          top: '-100000px',
+          left: '-100000px',
+          width: '794px',
+          zIndex: -99999,
+          pointerEvents: 'none',
+          opacity: 1,
+          overflow: 'visible',
+          margin: 0,
+          padding: 0,
+          background: '#ffffff'
+        }}
+        dir="ltr"
+      >
+        <TicketPreview 
+          ref={pdfExportRef}
+          data={{
+            passenger,
+            flights: tripType === TripType.ROUND_TRIP ? [flight1, flight2] : [flight1],
+            tripType,
+            agency,
+            showPrice,
+            isLoggedIn: !!currentUser,
+            templateId: selectedTemplate
+          }}
+        />
+      </div>
+
       {/* Hidden Print Container for History */}
       {historyTicketData && (
-          <div style={{ position: 'absolute', top: '-10000px', left: '-10000px' }} dir="ltr">
+          <div 
+            id="history-pdf-export-portal"
+            aria-hidden="true"
+            style={{ 
+              position: 'fixed', 
+              top: '-100000px', 
+              left: '-100000px', 
+              width: '794px', 
+              zIndex: -99999,
+              pointerEvents: 'none',
+              opacity: 1,
+              overflow: 'visible',
+              margin: 0,
+              padding: 0,
+              background: '#ffffff'
+            }} 
+            dir="ltr"
+          >
               <TicketPreview ref={historyPrintRef} data={historyTicketData} />
           </div>
       )}

@@ -42,6 +42,8 @@ export const translations = {
     male: "Male",
     female: "Female",
     price: "Price",
+    issueTime: "Issue Time",
+    issueDate: "Issue Date",
     
     // Flights
     goFlight: "Go Flight",
@@ -252,6 +254,8 @@ export const translations = {
     male: "مرد",
     female: "زن",
     price: "مبلغ",
+    issueTime: "زمان صدور (Issue Time)",
+    issueDate: "تاریخ صدور (Issue Date)",
     
     // Flights
     goFlight: "پرواز رفت",
@@ -462,6 +466,8 @@ export const translations = {
     male: "ذكر",
     female: "أنثى",
     price: "السعر",
+    issueTime: "وقت الإصدار",
+    issueDate: "تاريخ الإصدار",
     
     // Flights
     goFlight: "رحلة الذهاب",

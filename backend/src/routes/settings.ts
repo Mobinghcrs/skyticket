@@ -99,7 +99,7 @@ router.put('/footer', protect, checkPermission('MANAGE_SETTINGS'), [
 // @route   GET /api/settings/static-pages
 // @desc    Get all static pages
 // @access  Public
-router.get('/static-pages', async (req, res) => {
+router.get(['/static-pages', '/pages'], async (req, res) => {
   try {
     const staticPages = await prisma.staticPage.findMany({
       orderBy: { title: 'asc' }
@@ -121,7 +121,7 @@ router.get('/static-pages', async (req, res) => {
 // @route   GET /api/settings/static-pages/:slug
 // @desc    Get static page by slug
 // @access  Public
-router.get('/static-pages/:slug', async (req, res) => {
+router.get(['/static-pages/:slug', '/pages/:slug'], async (req, res) => {
   try {
     const { slug } = req.params;
 
@@ -287,6 +287,101 @@ router.delete('/static-pages/:id', protect, checkPermission('MANAGE_SETTINGS'), 
       });
     }
 
+    res.status(500).json({
+      success: false,
+      error: 'Server error'
+    });
+  }
+});
+
+// ===== TICKET PRICING CONFIG =====
+
+// @route   GET /api/settings/ticket-pricing
+// @desc    Get ticket pricing configuration
+// @access  Public
+router.get('/ticket-pricing', async (req, res) => {
+  try {
+    let pricing = await prisma.ticketPricingConfig.findFirst();
+    if (!pricing) {
+      pricing = await prisma.ticketPricingConfig.create({
+        data: {
+          defaultCurrency: 'IRR',
+          domesticPriceIrr: 500000,
+          domesticPriceUsd: 10,
+          internationalPriceIrr: 1500000,
+          internationalPriceUsd: 25,
+          exchangeRateUsdToIrr: 900000,
+          customAirlinePrices: [
+            { id: 'ap_1', airlineCode: 'W5', airlineName: 'Mahan Air (هواپیمایی ماهان)', priceIrr: 600000, priceUsd: 12, isActive: true },
+            { id: 'ap_2', airlineCode: 'IR', airlineName: 'Iran Air (هما ایران ایر)', priceIrr: 550000, priceUsd: 11, isActive: true },
+            { id: 'ap_3', airlineCode: 'TK', airlineName: 'Turkish Airlines (ترکیش ایرلاینز)', priceIrr: 2000000, priceUsd: 35, isActive: true },
+            { id: 'ap_4', airlineCode: 'EK', airlineName: 'Emirates (هواپیمایی امارات)', priceIrr: 2500000, priceUsd: 40, isActive: true },
+            { id: 'ap_5', airlineCode: 'FZ', airlineName: 'Flydubai (فلای دبی)', priceIrr: 1800000, priceUsd: 30, isActive: true },
+            { id: 'ap_6', airlineCode: 'QR', airlineName: 'Qatar Airways (قطر ایرویز)', priceIrr: 2500000, priceUsd: 40, isActive: true }
+          ]
+        }
+      });
+    }
+
+    res.json({
+      success: true,
+      data: pricing
+    });
+  } catch (error) {
+    console.error('Get ticket pricing error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Server error'
+    });
+  }
+});
+
+// @route   PUT /api/settings/ticket-pricing
+// @desc    Update ticket pricing configuration
+// @access  Private (Admin only)
+router.put('/ticket-pricing', protect, checkPermission('MANAGE_SETTINGS'), async (req, res) => {
+  try {
+    const {
+      defaultCurrency = 'IRR',
+      domesticPriceIrr = 500000,
+      domesticPriceUsd = 10,
+      internationalPriceIrr = 1500000,
+      internationalPriceUsd = 25,
+      exchangeRateUsdToIrr = 900000,
+      customAirlinePrices = []
+    } = req.body;
+
+    let existing = await prisma.ticketPricingConfig.findFirst();
+
+    const payload = {
+      defaultCurrency,
+      domesticPriceIrr: Number(domesticPriceIrr) || 0,
+      domesticPriceUsd: Number(domesticPriceUsd) || 0,
+      internationalPriceIrr: Number(internationalPriceIrr) || 0,
+      internationalPriceUsd: Number(internationalPriceUsd) || 0,
+      exchangeRateUsdToIrr: Number(exchangeRateUsdToIrr) || 0,
+      customAirlinePrices: Array.isArray(customAirlinePrices) ? customAirlinePrices : [],
+      updatedAt: new Date().toISOString()
+    };
+
+    let result;
+    if (existing) {
+      result = await prisma.ticketPricingConfig.update({
+        where: { id: existing.id },
+        data: payload
+      });
+    } else {
+      result = await prisma.ticketPricingConfig.create({
+        data: payload
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Update ticket pricing error:', error);
     res.status(500).json({
       success: false,
       error: 'Server error'

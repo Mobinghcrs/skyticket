@@ -8,6 +8,11 @@ export interface User {
   role: 'ADMIN' | 'AGENT' | 'USER';
   status: 'ACTIVE' | 'INACTIVE';
   credit: number;
+  creditIrr?: number;
+  creditUsd?: number;
+  giftCredit?: number;
+  giftCreditIrr?: number;
+  giftCreditUsd?: number;
   isUnlimited: boolean;
   bonusFreeTickets: number;
   permissions: string[];
@@ -23,6 +28,11 @@ export interface CreateUserData {
   role?: 'ADMIN' | 'AGENT' | 'USER';
   status?: 'ACTIVE' | 'INACTIVE';
   credit?: number;
+  creditIrr?: number;
+  creditUsd?: number;
+  giftCredit?: number;
+  giftCreditIrr?: number;
+  giftCreditUsd?: number;
   isUnlimited?: boolean;
   bonusFreeTickets?: number;
 }
@@ -35,8 +45,26 @@ export interface UpdateUserData {
   role?: 'ADMIN' | 'AGENT' | 'USER';
   status?: 'ACTIVE' | 'INACTIVE';
   credit?: number;
+  creditIrr?: number;
+  creditUsd?: number;
+  giftCredit?: number;
+  giftCreditIrr?: number;
+  giftCreditUsd?: number;
   isUnlimited?: boolean;
   bonusFreeTickets?: number;
+}
+
+function extractErrorMessage(error: any, fallback: string): string {
+  if (error.response?.data) {
+    const data = error.response.data;
+    if (data.details && Array.isArray(data.details) && data.details.length > 0) {
+      return data.details.map((d: any) => d.msg || `${d.path} is invalid`).join(' | ');
+    }
+    if (data.error) {
+      return data.error;
+    }
+  }
+  return error.message || fallback;
 }
 
 export class UserService {
@@ -45,7 +73,7 @@ export class UserService {
       const response = await api.get('/users');
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Failed to get users');
+      throw new Error(extractErrorMessage(error, 'Failed to get users'));
     }
   }
 
@@ -54,7 +82,7 @@ export class UserService {
       const response = await api.get(`/users/${id}`);
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Failed to get user');
+      throw new Error(extractErrorMessage(error, 'Failed to get user'));
     }
   }
 
@@ -63,7 +91,7 @@ export class UserService {
       const response = await api.post('/users', userData);
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Failed to create user');
+      throw new Error(extractErrorMessage(error, 'Failed to create user'));
     }
   }
 
@@ -72,7 +100,7 @@ export class UserService {
       const response = await api.put(`/users/${id}`, userData);
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Failed to update user');
+      throw new Error(extractErrorMessage(error, 'Failed to update user'));
     }
   }
 
@@ -80,7 +108,7 @@ export class UserService {
     try {
       await api.delete(`/users/${id}`);
     } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Failed to delete user');
+      throw new Error(extractErrorMessage(error, 'Failed to delete user'));
     }
   }
 
@@ -89,7 +117,7 @@ export class UserService {
       const response = await api.patch(`/users/${id}/status`);
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Failed to toggle user status');
+      throw new Error(extractErrorMessage(error, 'Failed to toggle user status'));
     }
   }
 }

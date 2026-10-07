@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
+import { createInMemPrismaClient } from './db/inMemoryPrisma';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -28,13 +28,18 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Initialize Prisma
-export const prisma = new PrismaClient();
+// Initialize Prisma: in-memory store
+export const prisma = createInMemPrismaClient();
 
-// Middleware
-app.use(helmet());
+// Middleware - allow iframe embedding for AI Studio preview
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+  frameguard: false
+}));
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: true,
   credentials: true
 }));
 
@@ -99,6 +104,7 @@ app.get('/api/assets/proxy', async (req, res, next) => {
 
     res.setHeader('Content-Type', contentType);
     res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.send(buffer);
   } catch (error) {
     next(error);
@@ -116,12 +122,12 @@ app.use('/api/blog', blogRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/revenue', revenueRoutes);
 
-// Error handling middleware
-app.use(notFound);
+// Error handling middleware for /api routes only
+app.use('/api', notFound);
 app.use(errorHandler);
 
-// Start server
-async function startServer() {
+// Start server function
+export async function startStandaloneServer() {
   try {
     // Test database connection
     await prisma.$connect();
@@ -152,4 +158,9 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-startServer();
+if (process.env.RUN_STANDALONE === 'true') {
+  startStandaloneServer();
+}
+
+export { app };
+export default app;

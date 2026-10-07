@@ -77,9 +77,11 @@ router.get('/:id', protect, async (req, res) => {
 router.post('/', protect, [
   body('firstName').trim().isLength({ min: 1 }),
   body('lastName').trim().isLength({ min: 1 }),
-  body('gender').isIn(['Male', 'Female']),
+  body('gender').isIn(['Male', 'Female', 'Infant']),
   body('passportNumber').trim().isLength({ min: 1 }),
-  body('nationality').trim().isLength({ min: 1 })
+  body('nationality').trim().isLength({ min: 1 }),
+  body('issueDate').optional().trim(),
+  body('issueTime').optional().trim()
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -91,7 +93,7 @@ router.post('/', protect, [
       });
     }
 
-    const { firstName, lastName, gender, passportNumber, nationality, totalFlights = 0 } = req.body;
+    const { firstName, lastName, gender, passportNumber, nationality, totalFlights = 0, issueDate, issueTime } = req.body;
 
     // Check if passport number already exists
     const existingPassenger = await prisma.savedPassenger.findFirst({
@@ -112,7 +114,9 @@ router.post('/', protect, [
         gender,
         passportNumber,
         nationality,
-        totalFlights
+        totalFlights,
+        issueDate,
+        issueTime
       }
     });
 

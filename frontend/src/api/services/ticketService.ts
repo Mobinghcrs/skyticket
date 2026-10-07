@@ -29,6 +29,7 @@ export interface CreateTicketData {
   route: string;
   date: string;
   price: string;
+  currency?: string;
   paymentMethod: string;
   status?: 'CONFIRMED' | 'CANCELLED' | 'PENDING';
   notes?: string;

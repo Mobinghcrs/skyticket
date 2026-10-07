@@ -34,7 +34,7 @@ router.get('/airlines', async (req, res) => {
 // @access  Private (Admin only)
 router.post('/airlines', protect, checkPermission('MANAGE_BASE_DATA'), [
   body('name').trim().isLength({ min: 1 }),
-  body('code').trim().isLength({ min: 2, max: 3 }).isUppercase(),
+  body('code').trim().isLength({ min: 1, max: 10 }),
   body('logoUrl').optional({ values: 'falsy' }).isString()
 ], async (req, res) => {
   try {
@@ -48,32 +48,52 @@ router.post('/airlines', protect, checkPermission('MANAGE_BASE_DATA'), [
     }
 
     const { name, code, logoUrl } = req.body;
+    const cleanCode = code.trim().toUpperCase();
+    const cleanName = name.trim();
 
-    // Check if code already exists
-    const existingAirline = await prisma.airline.findUnique({
-      where: { code }
+    // Check if code or name already exists
+    const existingAirline = await prisma.airline.findFirst({
+      where: {
+        OR: [
+          { code: cleanCode },
+          { name: cleanName }
+        ]
+      }
     });
 
     if (existingAirline) {
-      return res.status(400).json({
-        success: false,
-        error: 'Airline code already exists'
+      const updated = await prisma.airline.update({
+        where: { id: existingAirline.id },
+        data: {
+          name: cleanName,
+          code: cleanCode,
+          logoUrl: logoUrl || existingAirline.logoUrl
+        }
+      });
+      return res.status(200).json({
+        success: true,
+        data: updated
       });
     }
 
     const airline = await prisma.airline.create({
-      data: { name, code, logoUrl }
+      data: {
+        id: `air_${cleanCode.toLowerCase()}`,
+        name: cleanName,
+        code: cleanCode,
+        logoUrl: logoUrl || null
+      }
     });
 
     res.status(201).json({
       success: true,
       data: airline
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Create airline error:', error);
     res.status(500).json({
       success: false,
-      error: 'Server error'
+      error: error?.message || 'Server error'
     });
   }
 });
@@ -83,7 +103,7 @@ router.post('/airlines', protect, checkPermission('MANAGE_BASE_DATA'), [
 // @access  Private (Admin only)
 router.put('/airlines/:id', protect, checkPermission('MANAGE_BASE_DATA'), [
   body('name').optional().trim().isLength({ min: 1 }),
-  body('code').optional().trim().isLength({ min: 2, max: 3 }).isUppercase(),
+  body('code').optional().trim().isLength({ min: 1, max: 10 }),
   body('logoUrl').optional({ values: 'falsy' }).isString()
 ], async (req, res) => {
   try {
@@ -97,47 +117,63 @@ router.put('/airlines/:id', protect, checkPermission('MANAGE_BASE_DATA'), [
     }
 
     const { id } = req.params;
-    const updateData = req.body;
+    const updateData = { ...req.body };
+    delete updateData.id;
+    delete updateData.createdAt;
 
-    // Check if code conflicts
     if (updateData.code) {
-      const existingAirline = await prisma.airline.findFirst({
-        where: {
-          code: updateData.code,
-          id: { not: id }
-        }
-      });
-
-      if (existingAirline) {
-        return res.status(400).json({
-          success: false,
-          error: 'Another airline with this code already exists'
-        });
-      }
+      updateData.code = updateData.code.trim().toUpperCase();
+    }
+    if (updateData.name) {
+      updateData.name = updateData.name.trim();
     }
 
-    const airline = await prisma.airline.update({
-      where: { id },
-      data: updateData
+    // Find existing airline by ID first
+    let existingAirline = await prisma.airline.findUnique({
+      where: { id }
     });
+
+    // Fallback: match by code if ID was a numeric catalog ID (like "3") or mismatched
+    if (!existingAirline && updateData.code) {
+      existingAirline = await prisma.airline.findFirst({
+        where: { code: updateData.code }
+      });
+    }
+
+    // Fallback: match by name
+    if (!existingAirline && updateData.name) {
+      existingAirline = await prisma.airline.findFirst({
+        where: { name: updateData.name }
+      });
+    }
+
+    let airline;
+    if (existingAirline) {
+      airline = await prisma.airline.update({
+        where: { id: existingAirline.id },
+        data: updateData
+      });
+    } else {
+      // Upsert: Create airline if not found
+      airline = await prisma.airline.create({
+        data: {
+          id: id && id.startsWith('air_') ? id : `air_${(updateData.code || Date.now().toString()).toLowerCase()}`,
+          name: updateData.name || 'Airline',
+          code: (updateData.code || 'AIR').toUpperCase(),
+          logoUrl: updateData.logoUrl || null
+        }
+      });
+    }
 
     res.json({
       success: true,
       data: airline
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Update airline error:', error);
-
-    if ((error as any).code === 'P2025') {
-      return res.status(404).json({
-        success: false,
-        error: 'Airline not found'
-      });
-    }
-
     res.status(500).json({
       success: false,
-      error: 'Server error'
+      error: error?.message || 'Server error'
     });
   }
 });

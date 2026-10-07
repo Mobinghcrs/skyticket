@@ -11,6 +11,7 @@ export interface AgencyData {
   phone: string;
   logoUrl: string | null;
   showLogo?: boolean;
+  address?: string;
 }
 
 export interface Flight {
@@ -24,6 +25,8 @@ export interface Flight {
   destCode: string; // e.g., NJF
   destName: string; // e.g., Najaf
   airline: string;
+  airlineLogo?: string;
+  aircraft?: string; // e.g., Boeing 737
   baggage: string; // e.g., 20 kg
   handBaggage?: string; // e.g. 5 Kg (Specific to Sepehr)
   flightClass?: string; // e.g. YYSFF (Specific to Sepehr)
@@ -42,6 +45,8 @@ export interface Passenger {
   localPnr?: string; // Specific to Sepehr
   price?: string;
   idType?: 'Passport' | 'NationalID';
+  issueTime?: string;
+  issueDate?: string;
 }
 
 export interface TicketData {
@@ -71,8 +76,11 @@ export interface SavedPassenger {
   lastName: string;
   gender: string;
   passportNumber: string;
+  nationalId?: string;
   nationality: string;
   totalFlights: number;
+  issueDate?: string;
+  issueTime?: string;
 }
 
 export interface User {
